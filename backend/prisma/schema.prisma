@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  lastLogin     DateTime?
+  snippets      Snippet[]
+  favorites     Favorite[]
+}
+
+model Snippet {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  content     String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  tags        SnippetTag[]
+  favoritedBy Favorite[]
+}
+
+model Tag {
+  id       Int          @id @default(autoincrement())
+  name     String       @unique
+  snippets SnippetTag[]
+}
+
+model SnippetTag {
+  snippet   Snippet @relation(fields: [snippetId], references: [id])
+  snippetId Int
+  tag       Tag     @relation(fields: [tagId], references: [id])
+  tagId     Int
+
+  @@id([snippetId, tagId])
+}
+
+model Favorite {
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  snippet   Snippet @relation(fields: [snippetId], references: [id])
+  snippetId Int
+
+  @@id([userId, snippetId])
+}
