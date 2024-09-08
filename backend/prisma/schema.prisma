@@ -12,18 +12,17 @@ model User {
   username     String     @unique
   email        String     @unique
   passwordHash String
-  favorites    Favorite[]
   snippets     Snippet[]
 }
 
 model Snippet {
   id          String       @id @default(uuid())
   title       String
-  description String?
+  description String
   content     String
   userId      String
-  favoritedBy Favorite[]
-  user        User         @relation(fields: [userId], references: [id])
+  favorite    Boolean      @default(false)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   tags        SnippetTag[]
 }
 
@@ -36,17 +35,8 @@ model Tag {
 model SnippetTag {
   snippetId String
   tagId     String
-  snippet   Snippet @relation(fields: [snippetId], references: [id])
-  tag       Tag     @relation(fields: [tagId], references: [id])
+  snippet   Snippet @relation(fields: [snippetId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([snippetId, tagId])
-}
-
-model Favorite {
-  userId    String
-  snippetId String
-  snippet   Snippet @relation(fields: [snippetId], references: [id])
-  user      User    @relation(fields: [userId], references: [id])
-
-  @@id([userId, snippetId])
 }
