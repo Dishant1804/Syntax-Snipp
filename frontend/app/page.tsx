@@ -1,12 +1,11 @@
+import LandingPage from '@/components/landing/page'
+import Signin from '@/components/signin/page';
+
 
 export default function Home() {
-  const handleClick = () =>{
-    window.alert("Hello fckers");
-  }
 
   return (
-  <div>
-      Hello world
-    </div>
+    <Signin />
+    // <LandingPage />
   );
 }
