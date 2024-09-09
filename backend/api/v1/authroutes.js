@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import authMiddleware from './middleware/authMiddleware.js';
+import { z } from 'zod';
 
 const router = express.Router();
 
@@ -15,6 +16,17 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 const saltRounds = 12;
 
+const userSignupSchema = z.object({
+  username : z.string().toLowerCase().max(50).min(3),
+  email : z.string().email(),
+  password : z.string().min(8).max(50) 
+});
+
+const userSigninSchema = z.object({
+  email : z.string().email(),
+  password : z.string().min(8).max(50)
+})
+
 const signInLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -22,20 +34,26 @@ const signInLimiter = rateLimit({
 });
 
 router.post('/signup', async (req, res) => {
-  const { email, username, password } = req.body;
+  const body = req.body;
 
-  const passwordHash = await hash(password, saltRounds);
+  const validation = userSignupSchema.safeParse(body);
+
+  if(!validation.success){
+    return res.status(401).json({"message" : "Enter proper credentials"});
+  }
+
+  const passwordHash = await hash(req.body.password, saltRounds);
 
   try {
-    await prisma.user.create({
+    const test =  await prisma.user.create({
       data: {
-        username: username,
-        email: email,
+        username: req.body.username.toLowerCase(),
+        email: req.body.email,
         passwordHash: passwordHash
       }
     });
 
-    return res.json({ "Message": "Sign-up Successful" });
+    return res.json({ "Message": "Sign-up Successful" , "test contents" : test });
   } catch (e) {
     console.log(e);
     return res.status(400).json({ "error": e.message });
@@ -43,12 +61,17 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/signin', signInLimiter, async (req, res) => {
-  const { email, password } = req.body;
+  const body = req.body;
+  const validation = userSigninSchema.safeParse(body);
+
+  if(!validation.success){
+    return res.status(401).json({"message" : "Enter proper credentials"});
+  }
 
   try {
     const user = await prisma.user.findUnique({
       where: {
-        email: email
+        email: req.body.email
       },
       select: {
         id: true,
@@ -60,7 +83,7 @@ router.post('/signin', signInLimiter, async (req, res) => {
       return res.status(401).json({ "message": "Invalid Credentials" });
     }
 
-    const isPasswordValid = await compare(password, user.passwordHash);
+    const isPasswordValid = await compare(req.body.password, user.passwordHash);
 
     if (!isPasswordValid) {
       return res.status(401).json({ "message": "Invalid Credentials" });
