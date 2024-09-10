@@ -6,10 +6,12 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import authMiddleware from './middleware/authMiddleware.js';
 import { z } from 'zod';
+import passport from './config/passportConfig.js';
 
 const router = express.Router();
 
 router.use(helmet());
+router.use(passport.initialize());
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -32,6 +34,10 @@ const signInLimiter = rateLimit({
   max: 10,
   message: "Too many attempts. Please try again later.",
 });
+
+const createToken = (userId) => {
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
+}
 
 router.post('/signup', async (req, res) => {
   const body = req.body;
@@ -89,13 +95,29 @@ router.post('/signin', signInLimiter, async (req, res) => {
       return res.status(401).json({ "message": "Invalid Credentials" });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    const token = createToken(user.id)
     return res.json({ "message": "Sign-in Successful", "token": token });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ "message": "Internal Server Error" });
   }
 });
+
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/auth/google/callback', passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  (req, res) => {
+    res.json({ message: "Google authentication successful", token: req.user.token });
+  }
+);
+
+router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+router.get('/auth/github/callback', passport.authenticate('github', { session: false, failureRedirect: '/login' }),
+  (req, res) => {
+    res.json({ message: "GitHub authentication successful", token: req.user.token });
+  }
+);
 
 router.patch('/updateprofile', authMiddleware, signInLimiter, async (req, res) => {
   const { username, email, password } = req.body;
