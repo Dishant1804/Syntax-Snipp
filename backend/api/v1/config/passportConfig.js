@@ -2,20 +2,14 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET;
-
-const createToken = (userId) => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' }); 
-};
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "/auth/google/callback"
-}, async (profile, done) => {
+  callbackURL: "http://localhost:3000/api/v1/auth/google/callback"
+}, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await prisma.user.findFirst({ 
       where: { 
@@ -31,9 +25,9 @@ passport.use(new GoogleStrategy({
         }
       });
     }
-    const token = createToken(user.id);
-    done(null, { user, token });
-  } catch (error) {
+    done(null, { user, token: accessToken });
+  } 
+  catch (error) {
     done(error, null);
   }
 }));
@@ -41,8 +35,9 @@ passport.use(new GoogleStrategy({
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: "/auth/github/callback"
-}, async (profile, done) => {
+  callbackURL: "http://localhost:3000/api/v1/auth/github/callback"
+}, async (accessToken, refreshToken, profile, done) => {
+  console.log(profile);
   try {
     let user = await prisma.user.findFirst({ 
       where: {
@@ -52,14 +47,14 @@ passport.use(new GitHubStrategy({
     if (!user) {
       user = await prisma.user.create({
         data: {
-          username: profile.username,
+          username: profile.displayName,
           email: profile.emails[0].value,
           githubId: profile.id
         }
       });
     }
-    const token = createToken(user.id);
-    done(null, { user, token });
+
+    done(null, { user });
   } catch (error) {
     done(error, null);
   }
