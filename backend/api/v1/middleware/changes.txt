@@ -1,0 +1,4 @@
+make the new middleware that verifes the github anf google id
+
+figure out the way to add if else , if the user is using google then only call the middleware
+
