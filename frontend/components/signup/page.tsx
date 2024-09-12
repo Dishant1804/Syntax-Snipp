@@ -9,8 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { ChromeIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 export default function SignupComponent() {
+  const router = useRouter();
+  const { toast } = useToast();
   const [username, setUsername] = useState<string>("");
   const [email , setEmail] = useState<string>("");
   const [password , setPassword] = useState<string>("");
@@ -33,10 +37,17 @@ export default function SignupComponent() {
     try{
       const response = await axios.post("http://localhost:3000/api/v1/auth/signup" , data);
 
-      if(response.status !== 201){
-        window.alert("Try again later");
-        return;
+      if(response.data.status !== "signedup" && response.data.success !== true){
+        toast({
+          title: "Error while signing up",
+          description: "Something went wrong try again after sometime",
+        })
       }
+
+      toast({
+        title: "Sign up successfull",
+      })
+      router.push('/signin');
       
       setEmail("");
       setUsername("");
@@ -44,7 +55,10 @@ export default function SignupComponent() {
     }
     catch (e){
       console.error("Error during signup:", e);
-      window.alert("An error occurred. Please try again later.");
+      toast({
+        title: "Error while signing up",
+        description: "Something went wrong try again after sometime",
+      })
     }
   }
 

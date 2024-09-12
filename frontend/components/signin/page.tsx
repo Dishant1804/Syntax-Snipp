@@ -35,12 +35,11 @@ export default function SigninComponent() {
     try {
       const response = await axios.post("http://localhost:3000/api/v1/auth/signin", data);
   
-      if (response.status !== 200) {
+      if(response.data.status !== "signedup" && response.data.success !== true){
         toast({
           title: "Error while signing up",
           description: "Something went wrong try again after sometime",
         })
-        return;
       }
 
       console.log(response.data);
