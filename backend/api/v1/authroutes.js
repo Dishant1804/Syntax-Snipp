@@ -36,7 +36,7 @@ const signInLimiter = rateLimit({
 });
 
 const createToken = (userId) => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ userId }, JWT_SECRET);
 }
 
 /**
@@ -124,95 +124,64 @@ router.get('/google/callback', passport.authenticate('google', {
   }
 );
 
-router.get('/github', passport.authenticate('github', {
-  scope: ['read:user', 'gist']
-}));
-
-router.get('/github/callback', passport.authenticate('github', {
-  session: false,
-  failureRedirect: '/login'
-}),
-  (req, res) => {
-    const { id, username, profileUrl } = req.user.profile
-    const accessToken = req.user.token
-
-    const data = {
-      id,
-      username,
-      profileUrl,
-      accessToken,
-    }
-
-    const encodedData = encodeURIComponent(JSON.stringify(data));
-
-    res.redirect(`http://localhost:3000/api/v1/auth/link-github?data=${encodedData}`);
-  }
-);
-
-router.get('/link-github', authMiddleware, async (req, res) => {
-  const { data } = req.query;
-  const userId = req.user.userId;
-
-  if (!data) {
-    return res.status(400).json({ error: 'Something went wrong' });
-  }
+router.get('/github', (req, res, next) => {
+  const { token } = req.query;
 
   try {
-    const decodedData = JSON.parse(decodeURIComponent(data));
-    const { id, username, profileUrl, accessToken } = decodedData;
+    const decodedToken = jwt.verify(token, JWT_SECRET);
+    const userId = decodedToken.userId;
 
-    const isGithubLinked = await prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-      select: {
-        isGithub: true,
-      },
-    });
+    const state = encodeURIComponent(JSON.stringify({ userId }));
 
-    if (!isGithubLinked?.isGithub) {
-      try {
-        const updatedUser = await prisma.user.update({
-          where: {
-            id: userId,
-          },
-          data: {
-            isGithub: true,
-            github: {
-              create: {
-                id,
-                username,
-                profileUrl,
-                accesstoken: accessToken,
-              },
-            },
-          },
-          include: {
-            github: true,
-          },
-        });
-
-        if (!updatedUser.github) {
-          return res.json({ error: 'Failed to create GitHub profile' });
-        }
-
-        const token = jwt.sign({ id: updatedUser.github.id }, JWT_SECRET);
-        res.redirect(`http://localhost:3001/dashboard?token=${token}`);
-      } 
-      catch (updateError) {
-        console.error(updateError);
-        return res.status(500).json({ error: 'Failed to update GitHub profile' });
-      }
-    } 
-    else {
-      return res.json({ success: true, message: 'GitHub already linked' });
-    }
+    passport.authenticate('github', {
+      scope: ['read:user', 'gist'],
+      state: state,
+    })(req, res, next);
   } 
   catch (error) {
-    console.error(error);
-    res.status(400).json({ error: 'Invalid data format' });
+    console.error('Invalid or expired token:', error);
+    res.status(400).json({ error: 'Invalid or expired token', success: false });
   }
 });
+
+router.get('/github/callback', passport.authenticate('github', {
+    session: false,
+    failureRedirect: '/login',
+  }),
+  async (req, res) => {
+    try {
+      console.log('reached callback')
+      const { userId, profile, token } = req.user;
+
+      const updatedUser = await prisma.user.update({
+        where: { 
+          id: userId 
+        },
+        data: {
+          isGithub: true,
+          github: {
+            create: {
+              id: profile.id,
+              username: profile.username,
+              profileUrl: profile.profileUrl,
+              accesstoken: token,
+              userId : userId,
+            },
+          },
+        },
+      });
+
+      console.log('Updated User:', updatedUser);
+
+
+      const newToken = jwt.sign({ token }, process.env.JWT_SECRET);
+      res.redirect(`http://localhost:3001/dashboard?token=${newToken}`)
+    } catch (error) {
+      console.error('Error linking GitHub account:', error);
+      res.status(500).json({ error: 'Failed to link GitHub account', success: false });
+    }
+  }
+);
 
 
 router.patch('/updateprofile', authMiddleware, signInLimiter, async (req, res) => {
