@@ -1,12 +1,82 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import SpinnerWithText from "@/components/ui/spinnerWithText"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { LayoutGridIcon, HomeIcon, BriefcaseIcon, SquareCheckIcon, CalendarIcon } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import axios from 'axios';
+
+interface Snippet {
+  id : string;
+  content : string;
+  description : string;
+  favorite? : boolean
+}
 
 export default function DashboardComponent() {
+  const router = useRouter();
+  const [ snippets , setSnippets ] = useState<Snippet[]>([]);
+  const [isLoading , setIsLoading] = useState(true);
+  const [ error , setError] = useState<String | null>(null); 
+
+  useEffect(() => {
+    const fetchSnippets = async () => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        router.push('/signin');
+        return;
+      }
+
+      try {
+        const response = await axios.get<Snippet[]>(
+          'http://localhost:3000/api/v1/snippet/displayallsnippets',
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        );
+        setSnippets(response.data);
+      } 
+      catch (err) {
+        if (axios.isAxiosError(err)) {
+          setError(err.response?.data?.message || 'An error occurred while fetching snippets');
+          if (err.response?.status === 401) {
+            localStorage.removeItem('token');
+            router.push('/signin');
+          }
+        } else {
+          setError('An unexpected error occurred');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSnippets();
+  }, [router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <SpinnerWithText/>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-red-500">Error: {error}</p>;
+  }
+
+
+
   return (
     <div className="flex min-h-screen w-full">
       <div className="fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r bg-background p-4">
