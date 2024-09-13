@@ -133,9 +133,87 @@ router.get('/github/callback', passport.authenticate('github', {
   failureRedirect: '/login'
 }),
   (req, res) => {
-    res.json({ "status": "GitHub authentication successful", token: req.user.token, "success": true });
+    const { id, username, profileUrl } = req.user.profile
+    const accessToken = req.user.token
+
+    const data = {
+      id,
+      username,
+      profileUrl,
+      accessToken,
+    }
+
+    const encodedData = encodeURIComponent(JSON.stringify(data));
+
+    res.redirect(`http://localhost:3000/api/v1/auth/link-github?data=${encodedData}`);
   }
 );
+
+router.get('/link-github', authMiddleware, async (req, res) => {
+  const { data } = req.query;
+  const userId = req.user.userId;
+
+  if (!data) {
+    return res.status(400).json({ error: 'Something went wrong' });
+  }
+
+  try {
+    const decodedData = JSON.parse(decodeURIComponent(data));
+    const { id, username, profileUrl, accessToken } = decodedData;
+
+    const isGithubLinked = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        isGithub: true,
+      },
+    });
+
+    if (!isGithubLinked?.isGithub) {
+      try {
+        const updatedUser = await prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            isGithub: true,
+            github: {
+              create: {
+                id,
+                username,
+                profileUrl,
+                accesstoken: accessToken,
+              },
+            },
+          },
+          include: {
+            github: true,
+          },
+        });
+
+        if (!updatedUser.github) {
+          return res.json({ error: 'Failed to create GitHub profile' });
+        }
+
+        const token = jwt.sign({ id: updatedUser.github.id }, JWT_SECRET);
+        res.redirect(`http://localhost:3001/dashboard?token=${token}`);
+      } 
+      catch (updateError) {
+        console.error(updateError);
+        return res.status(500).json({ error: 'Failed to update GitHub profile' });
+      }
+    } 
+    else {
+      return res.json({ success: true, message: 'GitHub already linked' });
+    }
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(400).json({ error: 'Invalid data format' });
+  }
+});
+
 
 router.patch('/updateprofile', authMiddleware, signInLimiter, async (req, res) => {
   const { username, email, password } = req.body;
@@ -205,8 +283,8 @@ router.get('/user/profile', authMiddleware, async (req, res) => {
       select: {
         username: true,
         email: true,
-        isGoogle : true,
-        isGithub : true,
+        isGoogle: true,
+        isGithub: true,
       }
     });
 

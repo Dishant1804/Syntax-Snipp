@@ -7,9 +7,9 @@ import cors from 'cors';
 const app = express();
 
 const corsOptions = {
-  origin: 'http://localhost:3001', 
+  origin: 'http://localhost:3001',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], 
-  allowedHeaders: ['Content-Type'], 
+  allowedHeaders: ['Content-Type' , 'Authorization'], 
 };
 
 app.use(express.json());

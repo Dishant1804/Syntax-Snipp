@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 
 const generateJWT = (user) => {
-  return jwt.sign({ userId : user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
 /**
@@ -20,9 +20,9 @@ passport.use(new GoogleStrategy({
   callbackURL: "http://localhost:3000/api/v1/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    let user = await prisma.user.findFirst({ 
-      where: { 
-        id : profile.id
+    let user = await prisma.user.findFirst({
+      where: {
+        id: profile.id
       }
     });
     if (!user) {
@@ -36,7 +36,7 @@ passport.use(new GoogleStrategy({
     }
     const token = generateJWT(user);
     done(null, { user, token });
-  } 
+  }
   catch (error) {
     done(error, null);
   }
@@ -53,22 +53,7 @@ passport.use(new GitHubStrategy({
 }, async (accessToken, refreshToken, profile, done) => {
   console.log(profile);
   try {
-    let user = await prisma.user.findFirst({ 
-      where: {
-        githubId: profile.id
-      }
-    });
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          username: profile.username,
-          email: profile.emails[0].value,
-          githubId: profile.id
-        }
-      });
-    }
-    const token = generateJWT(user);
-    done(null, { user , token });
+    done(null, { profile , token : accessToken });
   } catch (error) {
     done(error, null);
   }
