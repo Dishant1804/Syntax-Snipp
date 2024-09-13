@@ -4,7 +4,7 @@ import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import authMiddleware from './middleware/authMiddleware.js'; //update the middleware after changing the schema
+import authMiddleware from './middleware/authMiddleware.js';
 import { z } from 'zod';
 import passport from './config/passportConfig.js';
 
@@ -39,9 +39,7 @@ const createToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET);
 }
 
-/**
- * update after schema change
- */
+
 router.post('/signup', async (req, res) => {
   const body = req.body;
 
@@ -66,7 +64,7 @@ router.post('/signup', async (req, res) => {
   }
   catch (e) {
     console.log(e);
-    return res.status(400).json({ "error": e.message, "success": false });
+    return res.status(500).json({ "error": "Internal server error", "success": false });
   }
 });
 
@@ -93,7 +91,7 @@ router.post('/signin', signInLimiter, async (req, res) => {
       return res.status(401).json({ "message": "Invalid Credentials", "success": false });
     }
 
-    const isPasswordValid = await compare(req.body.password, user.passwordHash);
+    const isPasswordValid = compare(req.body.password, user.passwordHash);
 
     if (!isPasswordValid) {
       return res.status(401).json({ "message": "Invalid Credentials", "success": false });
@@ -112,17 +110,40 @@ router.get('/google', passport.authenticate('google', {
   scope: ['profile', 'email']
 }));
 
-/**
- * add proper redirect to the required page --> figure out what needs to be changed
- */
+
 router.get('/google/callback', passport.authenticate('google', {
   session: false,
   failureRedirect: '/login'
-}),
-  (req, res) => {
-    res.json({ "status": "Google authentication successful", token: req.user.token, "success": true });
-  }
-);
+}), async (req, res) => {
+    try {
+      const { profile } = req.user
+      let user = await prisma.user.findUnique({
+        where: {
+          email: profile.emails[0].value,
+        }
+      });
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            username: profile.displayName,
+            email: profile.emails[0].value,
+            isGoogle: true,
+          }
+        });
+
+        const newToken = jwt.sign({ userId : user.id } , JWT_SECRET);
+
+        res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${newToken}`);
+      }
+      else {
+        return res.redirect(`${process.env.FRONTEND_URL}/signin`)
+      }
+    }
+    catch (e) {
+      console.log(e);
+      res.status(500).json({ "error": "Internal server error" });
+    }
+  });
 
 router.get('/github', (req, res, next) => {
   const { token } = req.query;
@@ -137,7 +158,7 @@ router.get('/github', (req, res, next) => {
       scope: ['read:user', 'gist'],
       state: state,
     })(req, res, next);
-  } 
+  }
   catch (error) {
     console.error('Invalid or expired token:', error);
     res.status(400).json({ error: 'Invalid or expired token', success: false });
@@ -145,38 +166,44 @@ router.get('/github', (req, res, next) => {
 });
 
 router.get('/github/callback', passport.authenticate('github', {
-    session: false,
-    failureRedirect: '/login',
-  }),
+  session: false,
+  failureRedirect: '/login',
+}),
   async (req, res) => {
     try {
-      console.log('reached callback')
       const { userId, profile, token } = req.user;
 
-      const updatedUser = await prisma.user.update({
-        where: { 
-          id: userId 
+      await prisma.user.update({
+        where: {
+          id: userId
         },
         data: {
           isGithub: true,
           github: {
-            create: {
-              id: profile.id,
-              username: profile.username,
-              profileUrl: profile.profileUrl,
-              accesstoken: token,
-              userId : userId,
+            upsert: {
+              create: {
+                id: profile.id,
+                username: profile.username,
+                profileUrl: profile.profileUrl,
+                accesstoken: token,
+              },
+              update: {
+                username: profile.username,
+                profileUrl: profile.profileUrl,
+                accesstoken: token,
+              },
             },
           },
         },
+        include: {
+          github: true,
+        },
       });
 
-      console.log('Updated User:', updatedUser);
-
-
       const newToken = jwt.sign({ token }, process.env.JWT_SECRET);
-      res.redirect(`http://localhost:3001/dashboard?token=${newToken}`)
-    } catch (error) {
+      res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${newToken}`)
+    }
+    catch (error) {
       console.error('Error linking GitHub account:', error);
       res.status(500).json({ error: 'Failed to link GitHub account', success: false });
     }
