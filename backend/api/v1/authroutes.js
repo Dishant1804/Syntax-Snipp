@@ -115,35 +115,32 @@ router.get('/google/callback', passport.authenticate('google', {
   session: false,
   failureRedirect: '/login'
 }), async (req, res) => {
-    try {
-      const { profile } = req.user
-      let user = await prisma.user.findUnique({
-        where: {
-          email: profile.emails[0].value,
-        }
-      });
-      if (!user) {
-        user = await prisma.user.create({
-          data: {
-            username: profile.displayName,
-            email: profile.emails[0].value,
-            isGoogle: true,
-          }
-        });
+  try {
+    const { profile } = req.user
 
-        const newToken = jwt.sign({ userId : user.id } , JWT_SECRET);
+    const user = await prisma.user.upsert({
+      where: {
+        email: profile.emails[0].value,
+      },
+      update: {
+        isGoogle: true,
+      },
+      create: {
+        username: profile.displayName,
+        email: profile.emails[0].value,
+        isGoogle: true,
+      }
+    });
 
-        res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${newToken}`);
-      }
-      else {
-        return res.redirect(`${process.env.FRONTEND_URL}/signin`)
-      }
-    }
-    catch (e) {
-      console.log(e);
-      res.status(500).json({ "error": "Internal server error" });
-    }
-  });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+
+    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
+  }
+  catch (e) {
+    console.log(e);
+    res.status(500).json({ "error": "Internal server error" });
+  }
+});
 
 router.get('/github', (req, res, next) => {
   const { token } = req.query;
