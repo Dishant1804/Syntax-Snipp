@@ -58,6 +58,10 @@ export default function SigninComponent() {
     }
   };
 
+  const handleGoogleSignIn = async () =>{
+    window.location.href = ("http://localhost:3000/api/v1/auth/google")
+  }
+
   return (
     <div className="mx-10 sm:mx-auto max-w-[400px] space-y-6 flex flex-col justify-center items-center h-screen">
       <div className="space-y-2 text-center">
@@ -89,7 +93,7 @@ export default function SigninComponent() {
             <GitHubLogoIcon className="mr-2 h-4 w-4" />
             Sign in with GitHub
           </Button>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}> 
             <ChromeIcon className="mr-2 h-4 w-4" />
             Sign in with Google
           </Button>
