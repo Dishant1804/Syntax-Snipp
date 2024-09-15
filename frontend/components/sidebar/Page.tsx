@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code, LayoutDashboard, SquareDashedBottomCode, Star, MessageSquareDiff, SquareUser } from "lucide-react";
+import { Code, LayoutDashboard, SquareDashedBottomCode, Star, MessageSquareDiff, SquareUser, Flame, Bookmark } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
@@ -28,7 +28,8 @@ export const Sidebar = () => {
           { icon: SquareDashedBottomCode, text: "My snippets" },
           { icon: Star, text: "Favorites" },
           { icon: MessageSquareDiff, text: "Create Snippet" },
-          { icon: SquareUser, text: "Profile" }
+          { icon: SquareUser, text: "Profile" },
+          { icon: Flame, text: "Upgarde to Pro" }
         ].map(({ icon: Icon, text }) => (
           <div key={text} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
             <Icon className="h-5 w-5" />
@@ -38,8 +39,8 @@ export const Sidebar = () => {
       </div>
       <Separator className="bg-slate-400/20" />
       <div className="my-8 flex flex-col gap-3">
-        <h1 className="px-6 text-lg font-semibold">Popular Tags</h1>
-        <div className="flex flex-wrap px-8 gap-4">
+        <h1 className="px-6 text-lg font-semibold flex flex-row items-center gap-2 "><Bookmark className='h-5 w-6' /> Popular Tags</h1>
+        <div className="flex flex-wrap px-8 gap-3">
           {languages.map((language) => (
             <Badge
               key={language}
