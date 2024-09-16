@@ -92,7 +92,7 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
   }
 });
 
-router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, res) => {
+router.get('/displayallsnippets', SnippetLimiter, async (req, res) => {
 
   try {
     const allSnippets = await prisma.snippet.findMany({

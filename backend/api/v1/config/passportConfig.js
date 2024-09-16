@@ -22,16 +22,10 @@ passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
   callbackURL: `${process.env.BACKEND_URL}/api/v1/auth/github/callback`,
-  passReqToCallback: true,
-}, async (req, accessToken, refreshToken, profile, done) => {
-  const { state } = req.query
+}, async (accessToken, refreshToken, profile, done) => {
 
   try {
-    const decodedState = JSON.parse(decodeURIComponent(state));
-    const { userId } = decodedState;
-
-    const data = { profile, token: accessToken, userId };
-    done(null, data);
+    done(null,  { profile, token: accessToken });
   } catch (error) {
     done(error, null);
   }

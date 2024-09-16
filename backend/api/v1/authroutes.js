@@ -3,15 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
 import authMiddleware from './middleware/authMiddleware.js';
 import { z } from 'zod';
 import passport from './config/passportConfig.js';
 
 const router = express.Router();
-
-router.use(helmet());
-router.use(passport.initialize());
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -38,7 +34,6 @@ const signInLimiter = rateLimit({
 const createToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET);
 }
-
 
 router.post('/signup', async (req, res) => {
   const body = req.body;
@@ -91,14 +86,18 @@ router.post('/signin', signInLimiter, async (req, res) => {
       return res.status(401).json({ "message": "Invalid Credentials", "success": false });
     }
 
-    const isPasswordValid = compare(req.body.password, user.passwordHash);
+    const isPasswordValid = await compare(req.body.password, user.passwordHash);
 
     if (!isPasswordValid) {
       return res.status(401).json({ "message": "Invalid Credentials", "success": false });
     }
 
     const token = createToken(user.id)
-    return res.json({ "status": "signedin", "token": token, "success": true });
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    return res.json({ "status": "signedin", "success": true });
   }
   catch (e) {
     console.log(e);
@@ -133,8 +132,11 @@ router.get('/google/callback', passport.authenticate('google', {
     });
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
   }
   catch (e) {
     console.log(e);
@@ -142,33 +144,20 @@ router.get('/google/callback', passport.authenticate('google', {
   }
 });
 
-router.get('/github', (req, res, next) => {
-  const { token } = req.query;
-
-  try {
-    const decodedToken = jwt.verify(token, JWT_SECRET);
-    const userId = decodedToken.userId;
-
-    const state = encodeURIComponent(JSON.stringify({ userId }));
-
-    passport.authenticate('github', {
-      scope: ['read:user', 'gist'],
-      state: state,
-    })(req, res, next);
-  }
-  catch (error) {
-    console.error('Invalid or expired token:', error);
-    res.status(400).json({ error: 'Invalid or expired token', success: false });
-  }
+router.get('/github', authMiddleware, (req, res, next) => {
+  passport.authenticate('github', {
+    scope: ['read:user', 'gist'],
+  })(req, res, next);
 });
 
-router.get('/github/callback', passport.authenticate('github', {
+router.get('/github/callback', authMiddleware ,passport.authenticate('github', {
   session: false,
   failureRedirect: '/login',
 }),
   async (req, res) => {
     try {
-      const { userId, profile, token } = req.user;
+      const { profile, token } = req.user;
+      const userId = req.user.userId;
 
       await prisma.user.update({
         where: {
@@ -197,8 +186,16 @@ router.get('/github/callback', passport.authenticate('github', {
         },
       });
 
-      const newToken = jwt.sign({ token }, process.env.JWT_SECRET);
-      res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${newToken}`)
+      const newToken = jwt.sign({ userId }, process.env.JWT_SECRET);
+      res.cookie("token", newToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+      });
+      res.cookie("githubToken", token, {
+        httpOnly: true,
+        sameSite: 'lax',
+      });
+      res.redirect(`${process.env.FRONTEND_URL}/dashboard`)
     }
     catch (error) {
       console.error('Error linking GitHub account:', error);
@@ -208,7 +205,7 @@ router.get('/github/callback', passport.authenticate('github', {
 );
 
 
-router.patch('/updateprofile', authMiddleware, signInLimiter, async (req, res) => {
+router.patch('/updateprofile', signInLimiter, authMiddleware, signInLimiter, async (req, res) => {
   const { username, email, password } = req.body;
   const userId = req.user.userId;
 
@@ -292,6 +289,14 @@ router.get('/user/profile', authMiddleware, async (req, res) => {
     console.error(e);
     return res.status(500).json({ "error": "Internal server error", "success": false });
   }
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'lax',
+  });
+  res.json({ message: 'Logged out successfully' });
 });
 
 export default router;
