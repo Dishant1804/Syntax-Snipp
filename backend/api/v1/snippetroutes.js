@@ -97,6 +97,11 @@ router.get('/displayallsnippets', SnippetLimiter, async (req, res) => {
   try {
     const allSnippets = await prisma.snippet.findMany({
       include: {
+        user : {
+          select : {
+            username : true,
+          }
+        },
         tags: {
           select: {
             tag: {
