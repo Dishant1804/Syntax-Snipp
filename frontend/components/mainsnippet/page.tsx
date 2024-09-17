@@ -3,6 +3,7 @@ import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 
 export const MainSnippetComponent = () => {
+
   return <div className="text-white/90 flex flex-col" >
     <div className='py-4 px-8 flex flex-row justify-between items-center'>
       <div className='flex flex-row gap-4'>
@@ -29,6 +30,9 @@ export const MainSnippetComponent = () => {
       </div>
     </div>
     <Separator className='bg-slate-400/20' />
+    <div>
+      Display the snippet here
+    </div>
   </div>
 }
 
