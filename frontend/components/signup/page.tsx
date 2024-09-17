@@ -63,13 +63,7 @@ export default function SignupComponent() {
   }
 
   const handleGithubSignUp = () => {
-    const token = localStorage.getItem('token');
-  
-    if (token){
-      window.location.href = `http://localhost:3000/api/v1/auth/github?token=${encodeURIComponent(token)}`;
-    } else {
-      alert('Authentication token is missing. Please log in again.');
-    }
+    window.location.href = 'http://localhost:3000/api/v1/auth/github';
   };
 
   const handleGoogleSignUp = async () =>{
