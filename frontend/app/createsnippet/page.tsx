@@ -13,7 +13,7 @@ const CreateSnippet = () => {
           <Sidebar />
         </ResizablePanel>
         <ResizableHandle className="h-screen bg-slate-400/20 " />
-        <ResizablePanel minSize={24} defaultSize={76} >
+        <ResizablePanel minSize={24} defaultSize={82} >
           <CreateSnippetComponent />
         </ResizablePanel>
       </ResizablePanelGroup>

@@ -48,7 +48,7 @@ export const MonacoEditorDisplaySnippetComponent = () => {
           <div className='bg-green-500 h-3 w-3 rounded-full'></div>
         </div>
         <div className='flex items-center font-mono justify-center w-full text-white/90'>
-          ~/Syntax-snipp/createSnippet
+          ~/Syntax-snipp/dispalySnippet
         </div>
       </div>
       <div className='flex flex-row w-full justify-start px-2 items-center mb-4'>
