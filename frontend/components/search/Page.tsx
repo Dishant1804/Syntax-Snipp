@@ -33,7 +33,9 @@ export const SearchComponent = () => {
     const fetchSnippets = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/v1/snippet/displayallsnippets');
+        const response = await axios.get('http://localhost:3000/api/v1/snippet/displayallsnippets' , {
+          withCredentials : true,
+        });
         console.log(response.data);
         setSnippets(response.data.allSnippets);
         setError(null);
@@ -89,7 +91,7 @@ export const SearchComponent = () => {
                   <div className="text-lg font-medium flex">{snippet.user.username}</div>
                   <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
                   <div className="text-sm font-mono mt-4 flex flex-wrap">
-                    {truncateDescription(snippet.description)}
+                    {truncateDescription(snippet.description , 18)}
                   </div>
                   <div className="mt-2">
                     {snippet.tags.map((tag: string) => (

@@ -2,6 +2,7 @@ import React from 'react';
 import { Code, LayoutDashboard, SquareDashedBottomCode, Star, MessageSquareDiff, SquareUser, Flame, Bookmark } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import Link from 'next/link';
 
 const languages = [
   "JavaScript", "TypeScript", "Java", "Python", "C", "C++",
@@ -24,17 +25,17 @@ export const Sidebar = () => {
       <Separator className="bg-slate-400/20" />
       <div className="flex my-4 flex-col gap-2 px-6">
         {[
-          { icon: LayoutDashboard, text: "Dashboard" },
-          { icon: SquareDashedBottomCode, text: "My snippets" },
-          { icon: Star, text: "Favorites" },
-          { icon: MessageSquareDiff, text: "Create Snippet" },
-          { icon: SquareUser, text: "Profile" },
-          { icon: Flame, text: "Upgarde to Pro" }
-        ].map(({ icon: Icon, text }) => (
-          <div key={text} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
+          { icon: LayoutDashboard, text: "Dashboard" , redirectUri : '/dashboard'},
+          { icon: SquareDashedBottomCode, text: "My snippets" , redirectUri : '/mysnippets' },
+          { icon: Star, text: "Favorites" ,redirectUri : '/favorites'},
+          { icon: MessageSquareDiff, text: "Create Snippet" , redirectUri : '/createsnippet'},
+          { icon: SquareUser, text: "Profile" , redirectUri : '/profile'},
+          { icon: Flame, text: "Upgarde to Pro" ,redirectUri : '/upgradetopro' }
+        ].map(({ icon: Icon, text , redirectUri}) => (
+          <Link href={`http://localhost:3001${redirectUri}`} key={text} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
             <Icon className="h-5 w-5" />
             <h1>{text}</h1>
-          </div>
+          </Link>
         ))}
       </div>
       <Separator className="bg-slate-400/20" />
