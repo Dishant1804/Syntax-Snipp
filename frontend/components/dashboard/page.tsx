@@ -17,7 +17,7 @@ export default function DashboardComponent() {
         <ResizablePanel minSize={32} defaultSize={34} maxSize={44} >
           <SearchComponent />
         </ResizablePanel>
-        <ResizableHandle withHandle className="h-screen bg-slate-400/20 " />
+        <ResizableHandle className="h-screen bg-slate-400/20 " />
         <ResizablePanel minSize={44} defaultSize={48}>
           <MainSnippetComponent />
         </ResizablePanel>
