@@ -1,5 +1,8 @@
-import type { Metadata } from "next";
+'use client'
+
 import localFont from "next/font/local";
+import { Provider } from 'react-redux';
+import { store } from '../app/store/store';
 import "./globals.css";
 
 const geistSans = localFont({
@@ -13,10 +16,6 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "Syntax Snipp",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +26,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Provider store={store}>
+          {children}
+        </Provider>
       </body>
     </html>
   );

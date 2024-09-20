@@ -2,7 +2,12 @@ import { Editor, Monaco } from '@monaco-editor/react';
 import { customTheme } from '@/helpers/helper';
 import { useEffect, useRef, useState } from 'react';
 
-export const MonacoEditorDisplaySnippetComponent = () => {
+type SnippetContent = {
+  content : string;
+  language : string;
+}
+
+export const MonacoEditorDisplaySnippetComponent = ({content , language} : SnippetContent) => {
   const monacoRef = useRef<Monaco | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: '100%' });
@@ -60,8 +65,9 @@ export const MonacoEditorDisplaySnippetComponent = () => {
             onMount={handleEditorDidMount}
             options={{
               minimap: { enabled: false },
-              // language: { snippet.language }, // Add the language to the snippet (assuming you have it available)
+              language: { language}, // Add the language to the snippet (assuming you have it available)
               theme: 'customTheme',
+              value :{content},
               formatOnPaste: true,
               fontSize: 18,
             }}

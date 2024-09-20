@@ -85,9 +85,8 @@ const CreateSnippetComponent = () => {
               </div>
               <div className='flex flex-col mt-4'>
                 <Label className='text-xl flex items-start'>Snippet</Label>
-                <MonacoEditorCreateSnippetComponent />
+                <MonacoEditorCreateSnippetComponent title={title} description={description} tags={tags} />
               </div>
-              <Button className='mt-4 bg-[#272727] text-white/90'>Submit</Button>
             </div>
           </div>
         </div>

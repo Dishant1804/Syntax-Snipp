@@ -1,15 +1,17 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState } from "react"
-import axios from "axios"
-import { Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
-import { SpinnerWithText } from "../ui/spinnerWithText"
-import { useDebounce } from "@/hooks/useDebounce"
-import { truncateTitle, truncateDescription } from "@/helpers/helper"
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { SpinnerWithText } from "../ui/spinnerWithText";
+import { useDebounce } from "@/hooks/useDebounce";
+import { truncateTitle, truncateDescription } from "@/helpers/helper";
+import { useDispatch } from "react-redux";
+import { setSelectedSnippet } from "../../app/store/snippetSlice";
 
 type Snippet = {
   id: string;
@@ -26,18 +28,24 @@ export const SearchComponent = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchItem, setSearchItem] = useState<string>("");
-  
+
   const debouncedSearchTerm = useDebounce(searchItem, 300);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchSnippets = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/v1/snippet/displayallsnippets' , {
-          withCredentials : true,
+        const response = await axios.get('http://localhost:3000/api/v1/snippet/displayallsnippets', {
+          withCredentials: true,
         });
-        console.log(response.data);
-        setSnippets(response.data.allSnippets);
+        const fetchedSnippets = response.data.allSnippets;
+        setSnippets(fetchedSnippets);
+        
+        if (fetchedSnippets.length > 0) {
+          dispatch(setSelectedSnippet(fetchedSnippets[0]));
+        }
+        
         setError(null);
       } catch (e) {
         console.error(e);
@@ -48,7 +56,7 @@ export const SearchComponent = () => {
     };
 
     fetchSnippets();
-  }, []);
+  }, [dispatch]);
 
   const filteredSnippets = useMemo(() => {
     return snippets.filter((snippet) =>
@@ -58,6 +66,10 @@ export const SearchComponent = () => {
       snippet.user.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
   }, [snippets, debouncedSearchTerm]);
+
+  const handleSnippetClick = (snippet: Snippet) => {
+    dispatch(setSelectedSnippet(snippet));
+  };
 
   return (
     <div className="flex flex-col h-full text-white/90">
@@ -76,7 +88,7 @@ export const SearchComponent = () => {
           />
         </div>
       </div>
-      <ScrollArea className="flex-grow px-8 overflow-y-auto" type="always" >
+      <ScrollArea className="flex-grow px-8 overflow-y-auto" type="always">
         <div className="flex flex-col pb-1">
           {loading ? (
             <div className="flex justify-center items-center h-screen">
@@ -87,11 +99,15 @@ export const SearchComponent = () => {
           ) : (
             filteredSnippets.length > 0 ? (
               filteredSnippets.map((snippet) => (
-                <div key={snippet.id} className="h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 hover:hover:bg-[#272729]/30 transition ease-in-out duration-100 ">
+                <div
+                  key={snippet.id}
+                  className="h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 hover:bg-[#272729]/30 transition ease-in-out duration-100 cursor-pointer"
+                  onClick={() => handleSnippetClick(snippet)}
+                >
                   <div className="text-lg font-medium flex">{snippet.user.username}</div>
                   <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
                   <div className="text-sm font-mono mt-4 flex flex-wrap">
-                    {truncateDescription(snippet.description , 18)}
+                    {truncateDescription(snippet.description, 18)}
                   </div>
                   <div className="mt-2">
                     {snippet.tags.map((tag: string) => (

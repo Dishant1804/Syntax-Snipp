@@ -1,54 +1,16 @@
-import { Trash2, Star, Pencil } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import axios from 'axios'
-import { useState, useEffect } from 'react'
-import { truncateDescription } from '@/helpers/helper'
-import { MonacoEditorDisplaySnippetComponent } from '../monacoEditorDisplaySnippet/page'
-
-type Snippet = {
-  id: string;
-  title: string;
-  description: string;
-  user: {
-    username: string;
-  };
-  tags: string[];
-};
+import { Trash2, Star, Pencil } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { MonacoEditorDisplaySnippetComponent } from '../monacoEditorDisplaySnippet/page';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../app/store/store';
+import { truncateDescription } from '@/helpers/helper';
 
 export const MainSnippetComponent = () => {
-  const [snippet, setSnippet] = useState<Snippet | undefined>(undefined);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const snippet = useSelector((state: RootState) => state.snippet.selectedSnippet);
 
-  useEffect(() => {
-    const id = '0513ee9d-ce55-40b1-8368-73635c17673d';
-    const fetchSnippets = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`http://localhost:3000/api/v1/snippet/displaysnippet/${id}`, {
-          withCredentials: true,
-        });
-        console.log(response.data);
-        setSnippet(response.data.snippet);
-        setError(null);
-      } catch (e) {
-        console.error(e);
-        setError("Failed to fetch snippets");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSnippets();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
+  if (!snippet) {
+    return <div>No snippet selected</div>;
   }
 
   return (
@@ -72,15 +34,15 @@ export const MainSnippetComponent = () => {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className='mt-2 font-semibold text-xl font-mono'>{snippet?.user.username}</h1>
-          <p className='text-md mt-2'>{snippet?.title}</p>
-          <p className='text-sm mt-1 font-mono'>{snippet?.description ? truncateDescription(snippet.description , 30) : ''}</p>
+          <h1 className='mt-2 font-semibold text-xl font-mono'>{snippet.user.username}</h1>
+          <p className='text-md mt-2'>{snippet.title}</p>
+          <p className='text-sm mt-1 font-mono'>{snippet.description ? truncateDescription(snippet.description, 30) : ''}</p>
         </div>
       </div>
       <Separator className='bg-slate-400/20' />
       <div className='mt-4'>
-        <MonacoEditorDisplaySnippetComponent />
+        <MonacoEditorDisplaySnippetComponent content={snippet.content} language={snippet.language} />
       </div>
     </div>
   );
-}
+};
