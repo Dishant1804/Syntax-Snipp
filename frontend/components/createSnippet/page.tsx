@@ -29,7 +29,7 @@ const CreateSnippetComponent = () => {
   useEffect(() => {
     setTimeout(()=>{
       setLoading(false);
-    } , 1500)
+    } , 1000)
   },[])
 
   return (<div className="flex flex-col h-screen text-white/90">

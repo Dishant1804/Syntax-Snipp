@@ -10,8 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { SpinnerWithText } from "../ui/spinnerWithText";
 import { useDebounce } from "@/hooks/useDebounce";
 import { truncateTitle, truncateDescription } from "@/helpers/helper";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSelectedSnippet } from "../../app/store/snippetSlice";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Snippet = {
   id: string;
@@ -28,35 +29,39 @@ export const SearchComponent = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchItem, setSearchItem] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"allsnippets" | "mysnippets">("allsnippets");
 
   const debouncedSearchTerm = useDebounce(searchItem, 300);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchSnippets = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/v1/snippet/displayallsnippets', {
-          withCredentials: true,
-        });
-        const fetchedSnippets = response.data.allSnippets;
-        setSnippets(fetchedSnippets);
-        
-        if (fetchedSnippets.length > 0) {
-          dispatch(setSelectedSnippet(fetchedSnippets[0]));
-        }
-        
-        setError(null);
-      } catch (e) {
-        console.error(e);
-        setError("Failed to fetch snippets");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSnippets();
-  }, [dispatch]);
+  }, [dispatch, activeTab]);
+
+  const fetchSnippets = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const endpoint = activeTab === "allsnippets" 
+        ? 'http://localhost:3000/api/v1/snippet/displayallsnippets'
+        : 'http://localhost:3000/api/v1/snippet/mysnippets';
+      const response = await axios.get(endpoint, {
+        withCredentials: true,
+      });
+      const fetchedSnippets = response.data.allSnippets || response.data.snippets || [];
+      setSnippets(fetchedSnippets);
+
+      if (fetchedSnippets.length > 0) {
+        dispatch(setSelectedSnippet(fetchedSnippets[0]));
+      }
+    } catch (e) {
+      console.error(e);
+      setError("Failed to fetch snippets");
+      setSnippets([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredSnippets = useMemo(() => {
     return snippets.filter((snippet) =>
@@ -68,13 +73,24 @@ export const SearchComponent = () => {
   }, [snippets, debouncedSearchTerm]);
 
   const handleSnippetClick = (snippet: Snippet) => {
+    //@ts-ignore
     dispatch(setSelectedSnippet(snippet));
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as "allsnippets" | "mysnippets");
   };
 
   return (
     <div className="flex flex-col h-full text-white/90">
-      <div className="flex px-6 py-4 text-white/90">
-        <h1 className="text-xl">Search Snippets</h1>
+      <div className="flex flex-row justify-between px-10 py-3 text-white/90">
+        <h1 className="text-xl font-medium">Search Snippets</h1>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-auto items-center justify-center flex">
+          <TabsList className="grid w-auto h-auto grid-cols-2 bg-[#272729]">
+            <TabsTrigger value="allsnippets" className="bg-black">All Snippets</TabsTrigger>
+            <TabsTrigger value="mysnippets" className="bg-black">My Snippets</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
       <Separator className="bg-slate-400/20" />
       <div className="px-8 py-3 supports-[backdrop-filter]:bg-[#111111]/60">
@@ -96,6 +112,8 @@ export const SearchComponent = () => {
             </div>
           ) : error ? (
             <div>{error}</div>
+          ) : snippets.length === 0 ? (
+            <div>No snippets found</div>
           ) : (
             filteredSnippets.length > 0 ? (
               filteredSnippets.map((snippet) => (

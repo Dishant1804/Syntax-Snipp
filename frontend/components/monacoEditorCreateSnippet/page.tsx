@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from '../ui/button';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 type SnippetContents = {
   title: string,
@@ -17,6 +18,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: '100%' });
   const [selectedLanguage, setSelectedLanguage] = useState('javascript');
+  const router = useRouter();
 
   const handleEditorWillMount = (monaco: Monaco) => {
     monaco.editor.defineTheme('customTheme', customTheme);
@@ -62,6 +64,9 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
         withCredentials: true
       });
       console.log('Snippet created:', response.data);
+      if(response.data.message === "Snippet created successfully"){
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error('Error creating snippet:', error);
     }
@@ -108,6 +113,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
               formatOnPaste: true,
               cursorBlinking: "smooth",
               fontSize: 18,
+              tabSize : 4,
             }}
             className="flex"
           />

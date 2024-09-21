@@ -1,16 +1,19 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { Editor, Monaco } from '@monaco-editor/react';
 import { customTheme } from '@/helpers/helper';
-import { useEffect, useRef, useState } from 'react';
+import { Copy, Check } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 type SnippetContent = {
-  content : string;
-  language : string;
+  content: string;
+  language: string;
 }
 
-export const MonacoEditorDisplaySnippetComponent = ({content , language} : SnippetContent) => {
+export const MonacoEditorDisplaySnippetComponent = ({ content, language }: SnippetContent) => {
   const monacoRef = useRef<Monaco | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: '100%' });
+  const [copied, setCopied] = useState(false);
 
   const handleEditorWillMount = (monaco: Monaco) => {
     monaco.editor.defineTheme('customTheme', customTheme);
@@ -26,7 +29,7 @@ export const MonacoEditorDisplaySnippetComponent = ({content , language} : Snipp
       renderLineHighlight: 'none',
     });
 
-    editor._domElement.style.caretColor = 'transparent';
+    editor._domElement.style.caretColor = '#272729';
   }
 
   useEffect(() => {
@@ -44,6 +47,16 @@ export const MonacoEditorDisplaySnippetComponent = ({content , language} : Snipp
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
   return (
     <div className='px-4 mx-6 mt-4 max-h-screen bg-[#1a1a1a] flex flex-col justify-center items-center rounded-xl'>
       <div className='flex flex-row w-full'>
@@ -53,25 +66,48 @@ export const MonacoEditorDisplaySnippetComponent = ({content , language} : Snipp
           <div className='bg-green-500 h-3 w-3 rounded-full'></div>
         </div>
         <div className='flex items-center font-mono justify-center w-full text-white/90'>
-          ~/Syntax-snipp/dispalySnippet
+          ~/Syntax-snipp/displaySnippet
         </div>
+      </div>
+      <div className='h-auto flex justify-between items-center w-full px-10 font-mono text-md mb-3 text-[#aeafb2]'>
+        <div className='border px-2 py-1 border-slate-400/20 rounded-lg'>
+          {language}
+        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <div 
+                className='p-2  rounded-lg items-center flex hover:bg-gray-700/20 cursor-pointer'
+                onClick={handleCopy}
+              >
+                {copied ? <Check className='h-5 w-5 items-center text-green-500' /> : <Copy className='h-5 w-5 items-center' />}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {copied ? 'Copied!' : 'Copy'}
+            </TooltipContent>
+          </Tooltip> 
+        </TooltipProvider>
       </div>
       <div className='flex flex-row w-full justify-start px-2 items-center mb-4'>
         <div ref={containerRef} className='flex-shrink overflow-hidden w-full'>
           <Editor
-            height="60vh"
+            height="55vh"
             width={dimensions.width}
+            language={language}
+            value={content}
             beforeMount={handleEditorWillMount}
             onMount={handleEditorDidMount}
             options={{
               minimap: { enabled: false },
-              language: { language}, // Add the language to the snippet (assuming you have it available)
               theme: 'customTheme',
-              value :{content},
               formatOnPaste: true,
               fontSize: 18,
+              readOnly: true,
+              domReadOnly: true,
+              renderLineHighlight: 'none',
+              tabSize: 4,
             }}
-            value='console.log("hello world")'
             className="flex"
           />
         </div>
