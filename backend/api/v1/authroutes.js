@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import authMiddleware from './middleware/authMiddleware.js';
 import { z } from 'zod';
-import passport from './config/passportConfig.js';
+import passport  from './config/passportConfig.js';
 
 const router = express.Router();
 
@@ -35,7 +35,7 @@ const createToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET);
 }
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', signInLimiter ,async (req, res) => {
   const body = req.body;
 
   const validation = userSignupSchema.safeParse(body);
@@ -44,17 +44,33 @@ router.post('/signup', async (req, res) => {
     return res.status(401).json({ "message": "Enter proper credentials", "success": false });
   }
 
-  const passwordHash = await hash(req.body.password, saltRounds);
-
   try {
-    await prisma.user.create({
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: req.body.email
+      }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ "message": "Email already in use", "success": false });
+    }
+
+    const passwordHash = await hash(req.body.password, saltRounds);
+    const lowerCaseUsername = req.body.username.toLowerCase();
+
+    const user = await prisma.user.create({
       data: {
-        username: req.body.username.toLowerCase(),
+        username: lowerCaseUsername,
         email: req.body.email,
         passwordHash: passwordHash
       }
     });
 
+    const token = createToken(user.id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
     return res.status(201).json({ "status": "signedup", "success": true });
   }
   catch (e) {
@@ -144,49 +160,41 @@ router.get('/google/callback', passport.authenticate('google', {
   }
 });
 
-router.get('/github', authMiddleware, (req, res, next) => {
+router.get('/github', (req, res, next) => {
   passport.authenticate('github', {
-    scope: ['read:user', 'gist'],
+    scope: ['read:user', 'user:email'],
   })(req, res, next);
 });
 
-router.get('/github/callback', authMiddleware ,passport.authenticate('github', {
+router.get('/github/callback', passport.authenticate('github', {
   session: false,
   failureRedirect: '/login',
 }),
   async (req, res) => {
     try {
       const { profile, token } = req.user;
-      const userId = req.user.userId;
+      const hashedToken = await hash(token, saltRounds);
 
-      await prisma.user.update({
+      const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+
+      let user = await prisma.user.findUnique({
         where: {
-          id: userId
-        },
-        data: {
-          isGithub: true,
-          github: {
-            upsert: {
-              create: {
-                id: profile.id,
-                username: profile.username,
-                profileUrl: profile.profileUrl,
-                accesstoken: token,
-              },
-              update: {
-                username: profile.username,
-                profileUrl: profile.profileUrl,
-                accesstoken: token,
-              },
-            },
-          },
-        },
-        include: {
-          github: true,
+          email: email,
         },
       });
 
-      const newToken = jwt.sign({ userId }, process.env.JWT_SECRET);
+      if(!user){
+        user = await prisma.user.create({
+          data: {
+            username: profile.username.toLowerCase(),
+            email: email,
+            passwordHash: hashedToken,
+            isGithub : true,
+          }
+        });
+      }
+
+      const newToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
       res.cookie("token", newToken, {
         httpOnly: true,
         sameSite: 'lax',

@@ -16,7 +16,7 @@ const SnippetLimiter = rateLimit({
  * Create a new snippet
  */
 router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) => {
-  const { title, content, description, tags, favorite } = req.body;
+  const { title, content, description, tags, favorite, language } = req.body;
 
   if (!title || !content || !description) {
     return res.status(400).json({ "error": "Title , content and description are required" });
@@ -30,6 +30,7 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
         description: description,
         userId: req.user.userId,
         favorite: favorite,
+        language: language,
         tags: {
           create: tags.map(tagName => ({
             tag: {
@@ -56,16 +57,16 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
  */
 router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, res) => {
   const { id } = req.params;
-  
+
   try {
     const snippet = await prisma.snippet.findUnique({
       where: {
         id: id,
       },
       include: {
-        user : {
-          select : {
-            username : true,
+        user: {
+          select: {
+            username: true,
           }
         },
         tags: {
@@ -97,14 +98,17 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
   }
 });
 
-router.get('/displayallsnippets', authMiddleware,  SnippetLimiter, async (req, res) => {
+/**
+ * Display all snippets
+ */
+router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, res) => {
 
   try {
     const allSnippets = await prisma.snippet.findMany({
       include: {
-        user : {
-          select : {
-            username : true,
+        user: {
+          select: {
+            username: true,
           }
         },
         tags: {
@@ -137,6 +141,9 @@ router.get('/displayallsnippets', authMiddleware,  SnippetLimiter, async (req, r
   }
 });
 
+/**
+ * Display user's snippets
+ */
 router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
   const userId = req.user.userId;
 
@@ -146,6 +153,11 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
         userId: userId,
       },
       include: {
+        user: {
+          select: {
+            username: true,
+          }
+        },
         tags: {
           include: {
             tag: true,
@@ -164,51 +176,59 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
       description: snippet.description,
       content: snippet.content,
       favorite: snippet.favorite,
+      user : snippet.user,
+      language : snippet.language,
       tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
     }));
 
     return res.status(200).json({ snippets: formattedSnippets });
-  } 
+  }
   catch (e) {
     console.error(e);
     return res.status(500).json({ "error": "Internal server error" });
   }
 });
 
-router.delete('/deletesnippet/:id' , authMiddleware , SnippetLimiter ,  async ( req , res) => {
-  const { id } =  req.params;
+/**
+ * Delete user's snippets
+ */
+router.delete('/deletesnippet/:id', authMiddleware, SnippetLimiter, async (req, res) => {
+  const { id } = req.params;
   const userId = req.user.userId;
 
-  try{
+  try {
     const toDeleteSnippet = await prisma.snippet.findFirst({
-      where : {
-        id : id,
-        userId : userId,
+      where: {
+        id: id,
+        userId: userId,
       }
     });
 
-    if(!toDeleteSnippet){
-      return res.status(404).json({"message" : "Snippet not found so not deleted"});
+    if (!toDeleteSnippet) {
+      return res.status(404).json({ "message": "Snippet not found so not deleted" });
     }
 
     await prisma.snippet.delete({
-      where : {
-        id : id,
+      where: {
+        id: id,
       }
     })
 
-    return res.status(200).json({"messae" : "Snippet deleted"});
+    return res.status(200).json({ "messae": "Snippet deleted" });
   }
-  catch(e){
+  catch (e) {
     console.log(e);
-    return res.status(500).json({"error" : "Internal server error"});
+    return res.status(500).json({ "error": "Internal server error" });
   }
 });
 
+/**
+ * Update user's Snippets
+ */
 router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, res) => {
   const { id } = req.params;
   const userId = req.user.userId;
-  const { title, description, content, favorite, tags } = req.body;
+  const { title, description, content, favorite, tags, language } = req.body;
 
   try {
     const toUpdateSnippet = await prisma.snippet.findFirst({
@@ -250,6 +270,13 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
         return res.status(400).json({ "error": "Content must be a non-empty string" });
       }
       updateData.content = content.trim();
+    }
+
+    if (language !== undefined) {
+      if (typeof language !== 'string' || content.trim().length === 0) {
+        return res.status(400).json({ "error": "Content must be a non-empty string" });
+      }
+      updateData.language = language.trim();
     }
 
     if (favorite !== undefined) {
