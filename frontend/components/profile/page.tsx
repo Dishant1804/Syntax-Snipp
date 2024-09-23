@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 const ProfileComponent = () => {
   const [username , setUsername] = useState<string>('');
   const [password ,setPassword] = useState<string>('');
-  const [email , setEmail] = useState<string>('');
   const router = useRouter();
 
   const handleUsername = (e: any) =>{
@@ -20,13 +19,9 @@ const ProfileComponent = () => {
     setPassword(e.target.value)
   }
   
-  const handleEmail = (e: any) =>{
-    setEmail(e.target.value)
-  }
 
   const data = {
     username,
-    email,
     password
   }
 
@@ -73,17 +68,6 @@ const ProfileComponent = () => {
       </div>
       <div className="flex text-md text-[#85868b] mt-1 ">
         This is your public display name. It can be your real name or a pseudonym. You can only change this once every 30 days.
-      </div>
-    </div>
-    <div className="flex flex-col mt-6">
-      <label className="text-lg">
-        Email
-      </label>
-      <div>
-        <Input placeholder="Email" className="pl-6 border-slate-400/20" onChange={(e) => handleEmail(e)}/>
-      </div>
-      <div className="flex text-md text-[#85868b] mt-1 ">
-        You can manage verified email addresses in your email settings.
       </div>
     </div>
     <div className="flex flex-col mt-6">
