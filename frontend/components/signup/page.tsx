@@ -67,7 +67,7 @@ export default function SignupComponent() {
   };
 
   const handleGoogleSignUp = async () =>{
-    window.location.href = ("http://localhost:3000/api/v1/auth/google")
+    window.location.href = ("http://localhost:3000/api/v1/auth/google/dashboard")
   }
 
   return (
