@@ -121,12 +121,16 @@ router.post('/signin', signInLimiter, async (req, res) => {
   }
 });
 
-router.get('/google', passport.authenticate('google', {
+router.get('/google/dashboard', passport.authenticate('google-dashboard', {
+  scope: ['profile', 'email']
+}));
+
+router.get('/google/vscode', passport.authenticate('google-vscode', {
   scope: ['profile', 'email']
 }));
 
 
-router.get('/google/callback', passport.authenticate('google', {
+router.get('/google/dashboard/callback', passport.authenticate('google-dashboard', {
   session: false,
   failureRedirect: '/login'
 }), async (req, res) => {
@@ -153,6 +157,40 @@ router.get('/google/callback', passport.authenticate('google', {
       sameSite: 'lax',
     });
     res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+  }
+  catch (e) {
+    console.log(e);
+    res.status(500).json({ "error": "Internal server error" });
+  }
+});
+
+router.get('/google/vscode/callback', passport.authenticate('google-vscode', {
+  session: false,
+  failureRedirect: '/login'
+}), async (req, res) => {
+  try {
+    const { profile } = req.user
+
+    const user = await prisma.user.upsert({
+      where: {
+        email: profile.emails[0].value,
+      },
+      update: {
+        isGoogle: true,
+      },
+      create: {
+        username: profile.displayName,
+        email: profile.emails[0].value,
+        isGoogle: true,
+      }
+    });
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    res.redirect(`${process.env.FRONTEND_URL}/vscode`);
   }
   catch (e) {
     console.log(e);

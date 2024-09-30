@@ -2,15 +2,27 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 
-passport.use(new GoogleStrategy({
+passport.use('google-dashboard' , new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: `${process.env.BACKEND_URL}/api/v1/auth/google/callback`,
-  passReqToCallback : true,
-}, async (req, accessToken, refreshToken, profile, done) => {
-  const state = req.query.state;
+  callbackURL: `${process.env.BACKEND_URL}/api/v1/auth/google/dashboard/callback`,
+}, async (accessToken, refreshToken, profile, done) => {
   try {
-    const data = { profile , state };
+    const data = { profile };
+    done(null, data);
+  }
+  catch (error) {
+    done(error, null);
+  }
+}));
+
+passport.use('google-vscode' , new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: `http://localhost:3000/api/v1/auth/google/vscode/callback`,
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const data = { profile };
     done(null, data);
   }
   catch (error) {
