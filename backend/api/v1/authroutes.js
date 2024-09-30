@@ -1,11 +1,11 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import { hash, compare } from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
-import authMiddleware from './middleware/authMiddleware.js';
-import { z } from 'zod';
-import passport  from './config/passportConfig.js';
+import express from "express";
+import { PrismaClient } from "@prisma/client";
+import { hash, compare } from "bcrypt";
+import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit";
+import authMiddleware from "./middleware/authMiddleware.js";
+import { z } from "zod";
+import passport from "./config/passportConfig.js";
 
 const router = express.Router();
 
@@ -17,13 +17,13 @@ const saltRounds = 12;
 const userSignupSchema = z.object({
   username: z.string().toLowerCase().max(50).min(3),
   email: z.string().email(),
-  password: z.string().min(8).max(50)
+  password: z.string().min(8).max(50),
 });
 
 const userSigninSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(50)
-})
+  password: z.string().min(8).max(50),
+});
 
 const signInLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -33,26 +33,30 @@ const signInLimiter = rateLimit({
 
 const createToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET);
-}
+};
 
-router.post('/signup', signInLimiter ,async (req, res) => {
+router.post("/signup", signInLimiter, async (req, res) => {
   const body = req.body;
 
   const validation = userSignupSchema.safeParse(body);
 
   if (!validation.success) {
-    return res.status(401).json({ "message": "Enter proper credentials", "success": false });
+    return res
+      .status(401)
+      .json({ message: "Enter proper credentials", success: false });
   }
 
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: req.body.email
-      }
+        email: req.body.email,
+      },
     });
 
     if (existingUser) {
-      return res.status(400).json({ "message": "Email already in use", "success": false });
+      return res
+        .status(400)
+        .json({ message: "Email already in use", success: false });
     }
 
     const passwordHash = await hash(req.body.password, saltRounds);
@@ -62,68 +66,80 @@ router.post('/signup', signInLimiter ,async (req, res) => {
       data: {
         username: lowerCaseUsername,
         email: req.body.email,
-        passwordHash: passwordHash
-      }
+        passwordHash: passwordHash,
+      },
     });
 
     const token = createToken(user.id);
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: "lax",
     });
-    return res.status(201).json({ "status": "signedup", "success": true });
-  }
-  catch (e) {
+    return res.status(201).json({ status: "signedup", success: true });
+  } catch (e) {
     console.log(e);
-    return res.status(500).json({ "error": "Internal server error", "success": false });
+    return res
+      .status(500)
+      .json({ error: "Internal server error", success: false });
   }
 });
 
-router.post('/signin', signInLimiter, async (req, res) => {
+router.post("/signin", signInLimiter, async (req, res) => {
   const body = req.body;
   const validation = userSigninSchema.safeParse(body);
 
   if (!validation.success) {
-    return res.status(401).json({ "message": "Enter proper credentials", "success": false });
+    return res
+      .status(401)
+      .json({ message: "Enter proper credentials", success: false });
   }
 
   try {
     const user = await prisma.user.findUnique({
       where: {
-        email: req.body.email
+        email: req.body.email,
       },
       select: {
         id: true,
-        passwordHash: true
-      }
+        passwordHash: true,
+      },
     });
 
     if (!user) {
-      return res.status(401).json({ "message": "Invalid Credentials", "success": false });
+      return res
+        .status(401)
+        .json({ message: "Invalid Credentials", success: false });
     }
 
     const isPasswordValid = await compare(req.body.password, user.passwordHash);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ "message": "Invalid Credentials", "success": false });
+      return res
+        .status(401)
+        .json({ message: "Invalid Credentials", success: false });
     }
 
-    const token = createToken(user.id)
+    const token = createToken(user.id);
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: "lax",
     });
-    return res.json({ "status": "signedin", "success": true });
-  }
-  catch (e) {
+    return res.json({ status: "signedin", success: true });
+  } catch (e) {
     console.log(e);
-    return res.status(500).json({ "message": "Internal Server Error", "success": false });
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", success: false });
   }
 });
 
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
+router.get('/google', (req , res ,next) => {
+  const state = req.query.callbackPath;
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    state : state,
+  })(req, res, next);
+});
 
 
 router.get('/google/callback', passport.authenticate('google', {
@@ -131,7 +147,7 @@ router.get('/google/callback', passport.authenticate('google', {
   failureRedirect: '/login'
 }), async (req, res) => {
   try {
-    const { profile } = req.user
+    const { profile, state } = req.user;
 
     const user = await prisma.user.upsert({
       where: {
@@ -148,10 +164,11 @@ router.get('/google/callback', passport.authenticate('google', {
     });
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: 'lax',
-    });
+
+    if (state === "vsCode") {
+      return res.redirect(`vscode://your-extension-id/authentication?token=${token}`);
+    }
+
     res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
   }
   catch (e) {
@@ -159,6 +176,7 @@ router.get('/google/callback', passport.authenticate('google', {
     res.status(500).json({ "error": "Internal server error" });
   }
 });
+
 
 router.get('/github', (req, res, next) => {
   passport.authenticate('github', {
@@ -183,13 +201,13 @@ router.get('/github/callback', passport.authenticate('github', {
         },
       });
 
-      if(!user){
+      if (!user) {
         user = await prisma.user.create({
           data: {
             username: profile.username.toLowerCase(),
             email: email,
             passwordHash: hashedToken,
-            isGithub : true,
+            isGithub: true,
           }
         });
       }
@@ -213,64 +231,62 @@ router.get('/github/callback', passport.authenticate('github', {
 );
 
 
-router.patch('/updateprofile', signInLimiter, authMiddleware, signInLimiter, async (req, res) => {
-  const { username, email, password } = req.body;
-  const userId = req.user.userId;
 
-  try {
-    const userToUpdate = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      }
-    });
+router.patch(
+  "/updateprofile",
+  signInLimiter,
+  authMiddleware,
+  signInLimiter,
+  async (req, res) => {
+    const { username, password } = req.body;
+    const userId = req.user.userId;
 
-    if (!userToUpdate) {
-      return res.status(404).json({ "error": "User not found", "success": false });
-    }
-
-    const updateData = {};
-
-    if (username) {
-      updateData.username = username;
-    }
-
-    if (email) {
-      const existingUser = await prisma.user.findUnique({
+    try {
+      const userToUpdate = await prisma.user.findUnique({
         where: {
-          email
-        }
+          id: userId,
+        },
       });
 
-      if (existingUser && existingUser.id !== userId) {
-        return res.status(400).json({ "error": "Email already in use", "success": false });
+      if (!userToUpdate) {
+        return res
+          .status(404)
+          .json({ error: "User not found", success: false });
       }
-      updateData.email = email;
-    }
 
-    if (password) {
-      const saltRounds = 12;
-      updateData.passwordHash = await hash(password, saltRounds);
-    }
+      const updateData = {};
 
-    if (Object.keys(updateData).length > 0) {
-      await prisma.user.update({
-        where: { id: userId },
-        data: updateData,
-      });
+      if (username) {
+        updateData.username = username;
+      }
 
-      return res.status(200).json({ "status": "updated", "success": true });
-    }
-    else {
-      return res.status(400).json({ "error": "No changes to update", "success": false });
-    }
-  }
-  catch (e) {
-    console.error(e);
-    return res.status(500).json({ "error": "Internal server error", "success": false });
-  }
-});
+      if (password) {
+        const saltRounds = 12;
+        updateData.passwordHash = await hash(password, saltRounds);
+      }
 
-router.get('/user/profile', authMiddleware, async (req, res) => {
+      if (Object.keys(updateData).length > 0) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: updateData,
+        });
+
+        return res.status(200).json({ status: "updated", success: true });
+      } else {
+        return res
+          .status(400)
+          .json({ error: "No changes to update", success: false });
+      }
+    } catch (e) {
+      console.error(e);
+      return res
+        .status(500)
+        .json({ error: "Internal server error", success: false });
+    }
+  },
+);
+
+router.get("/user/profile", authMiddleware, async (req, res) => {
   const userId = req.user.userId;
 
   try {
@@ -283,28 +299,30 @@ router.get('/user/profile', authMiddleware, async (req, res) => {
         email: true,
         isGoogle: true,
         isGithub: true,
-      }
+      },
     });
 
     if (!user) {
-      return res.status(404).json({ "error": "User not found", "success": false });
+      return res.status(404).json({ error: "User not found", success: false });
     }
 
-    return res.status(200).json({ "status": "retrieved", "success": true, profile: user });
-
-  }
-  catch (e) {
+    return res
+      .status(200)
+      .json({ status: "retrieved", success: true, profile: user });
+  } catch (e) {
     console.error(e);
-    return res.status(500).json({ "error": "Internal server error", "success": false });
+    return res
+      .status(500)
+      .json({ error: "Internal server error", success: false });
   }
 });
 
-router.post('/logout', (req, res) => {
-  res.clearCookie('token', {
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: "lax",
   });
-  res.json({ message: 'Logged out successfully' });
+  res.json({ message: "Logged out successfully" });
 });
 
 export default router;
