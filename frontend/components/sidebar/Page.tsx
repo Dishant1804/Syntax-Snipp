@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code, LayoutDashboard, SquareDashedBottomCode, Star, MessageSquareDiff, SquareUser, Flame, Bookmark } from "lucide-react";
+import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Flame, Bookmark } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
@@ -25,13 +25,12 @@ export const Sidebar = () => {
       <div className='flex flex-col'>
         <div className="flex flex-row gap-3 items-center justify-start py-4 px-6 cursor-pointer">
           <Code />
-          <h1 className="font-medium text-xl">Syntax Snipp</h1>
+          <Link href={'/dashboard'} className="font-medium text-xl">Syntax Snipp</Link>
         </div>
         <Separator className="bg-slate-400/20" />
         <div className="flex my-4 flex-col gap-2 px-6">
           {[
             { icon: LayoutDashboard, text: "Dashboard", redirectUri: '/dashboard' },
-            // { icon: SquareDashedBottomCode, text: "My snippets", redirectUri: '/mysnippets' },
             { icon: Star, text: "Favorites", redirectUri: '/favorites' },
             { icon: MessageSquareDiff, text: "Create Snippet", redirectUri: '/createsnippet' },
             { icon: SquareUser, text: "Profile", redirectUri: '/profile' },

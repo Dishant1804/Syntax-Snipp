@@ -6,7 +6,7 @@ const ProfileSettingsSidebar = ({ setOption }: { setOption: React.Dispatch<React
   return (
     <div className="w-full h-screen flex flex-col justify-between text-white/90">
       <div className='flex flex-col'>
-        <div className="flex flex-row gap-3 items-center justify-start py-4 px-6 cursor-pointer">
+        <div className="flex flex-row gap-3 items-center justify-start py-4 px-6">
           <h1 className="font-medium text-xl">Options</h1>
         </div>
         <Separator className="bg-slate-400/20" />
