@@ -27,7 +27,7 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
       data: {
         title: title,
         content: content,
-        description: description,
+        description: description, 
         userId: req.user.userId,
         favorite: favorite,
         language: language,
@@ -44,7 +44,7 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
       }
     });
 
-    return res.status(201).json({ "message": "Snippet created successfully", "snippet": snippet });
+    return res.status(201).json({ "message": "Snippet created successfully", "snippet": snippet , "success" : true});
   }
   catch (e) {
     console.log(e);
