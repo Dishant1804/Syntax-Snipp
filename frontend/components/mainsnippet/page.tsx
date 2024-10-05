@@ -5,12 +5,15 @@ import { MonacoEditorDisplaySnippetComponent } from '../monacoEditorDisplaySnipp
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store/store';
 import { truncateDescription } from '@/helpers/helper';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { SpinnerWithText } from '@/components/ui/spinnerWithText';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+
 
 export const MainSnippetComponent = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -60,13 +63,17 @@ export const MainSnippetComponent = () => {
 
   const handleDeleteClick = async () => {
     const id = snippet.id;
-    const response = await axios.delete(`http://localhost:3000/api/v1/snippet/deletesnippet/${id}` , {
-      withCredentials : true,
+    const response = await axios.delete(`http://localhost:3000/api/v1/snippet/deletesnippet/${id}`, {
+      withCredentials: true,
     })
 
-    if(response.data.message === "Snippet deleted"){
+    if (response.data.message === "Snippet deleted") {
       router.refresh();
     }
+  }
+
+  const handleEditClick = () => {
+    router.push('/editsnippet')
   }
 
   return (
@@ -89,8 +96,23 @@ export const MainSnippetComponent = () => {
                   onClick={handleFavoriteClick}
                 />
               )}
-              <Pencil className="h-5 w-5 cursor-pointer" />
-              <Trash2 className="h-5 w-5 cursor-pointer" onClick={handleDeleteClick} />
+              <Pencil className="h-5 w-5 cursor-pointer" onClick={handleEditClick}/>
+              <AlertDialog>
+                <AlertDialogTrigger><Trash2 className="h-5 w-5 cursor-pointer" /></AlertDialogTrigger>
+                <AlertDialogContent className='bg-[#18181a] border-0'>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className='text-white/90'>Are you sure you want to delete this snippet?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will delete your snippet
+                      and remove your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteClick}>Confirm</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
             <div className="pr-4">
               <Avatar>

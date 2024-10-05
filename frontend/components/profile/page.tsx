@@ -107,7 +107,7 @@ const ProfileComponent = ({ option }: { option: string }) => {
               <h1>Light Theme</h1>
             </div>
           </div>
-          <Button className="bg-white/90 text-black hover:bg-white/80 mt-8 ">Update preferences</Button>
+          <Button onClick={handleSubmit} className="mt-8">Update preferences</Button>
         </div>
       </>
     }

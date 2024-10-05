@@ -119,7 +119,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
           />
         </div>
       </div>
-      <Button className='mt-4 bg-[#130c0c] text-white/90' onClick={handleSubmitSnippet}>Submit</Button>
+      <Button onClick={handleSubmitSnippet} className="mt-4">Create snippet</Button>
     </>
   );
 }
