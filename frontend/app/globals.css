@@ -30,6 +30,7 @@
 @layer base {
   * {
     @apply border-border;
+    font-family: var(--font-space-mono)
   }
 
   body {
