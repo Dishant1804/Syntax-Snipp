@@ -3,8 +3,8 @@ import { Code2Icon } from "lucide-react";
 
 
 const NavbarComponent = () => {
-  return <nav className="w-full flex justify-center md:px-8 fixed">
-    <div className="w-full md:max-w-7xl flex flex-row md:justify-between items-center py-3 px-3 md:px-6 mx-3 my-2 rounded-xl gap-2 border border-slate-400/20">
+  return <nav className="w-full flex justify-center md:px-8 fixed z-10 ">
+    <div className="w-full md:max-w-7xl flex flex-row md:justify-between items-center py-3 px-3 md:px-6 mx-3 my-2 rounded-xl gap-2 border border-slate-400/20 backdrop-blur-sm bg-[#111111]/10">
       <div className="font-semibold flex flex-row flex-nowrap gap-2 items-center">
         <Code2Icon className="flex h-5 w-5 md:h-6 md:w-6" />
         <Link href='/' className="text-xl md:text-2xl cursor-pointer">Syntax-snipp</Link>

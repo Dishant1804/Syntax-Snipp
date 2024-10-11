@@ -1,6 +1,5 @@
 import React from 'react';
 import { Spotlight } from '../ui/spotlight';
-import { Button } from '../ui/button';
 import BlurIn from '../ui/blur-in';
 import Link from 'next/link';
 
@@ -11,19 +10,22 @@ const HeroSectionComponent = () => {
         className="w-[80%] -top-12 left-16 md:-top-48 md:left-64 "
         fill="white"
       />
-      <div className="px-6 py-4 md:px-12 flex items-center justify-center text-center w-full md:h-[70vh] flex-col">
+      <div className="px-6 py-4 md:px-12 flex items-center justify-center text-center w-full md:h-[65vh] flex-col">
+        <div className='py-2 text-sm md:text-lg text-center flex flex-wrap max-w-3xl md:max-w-6xl text-neutral-300 '>
+          For&nbsp;<span className='underline'>Developers</span>&nbsp;by a Developer...
+        </div>
         <div className="text-4xl font-bold md:text-7xl text-center md:font-bold md:text-start flex flex-wrap max-w-3xl md:max-w-6xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
           <div className='flex flex-warp text-center flex-col'>
             <h1>Unleash your coding superpowers with</h1>
             <BlurIn word='Syntax Snipp' duration={2} className='text-4xl md:text-7xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 py-2 inline-block pointer-events-none ' />
           </div>
         </div>
-        <div className='flex md:text-2xl pt-4 md:pt-8 text-neutral-300'>
-          Save your code snippets so you'll never have to write it again
+        <div className='flex md:text-xl pt-4 md:pt-8 text-neutral-300 max-w-2xl md:max-w-4xl'>
+          Syntax-snipp is your ultimate companion for creating, managing, and showcasing your code snippets. Say goodbye to repetitive coding, Access your snippets in IDEs, share them across your organizations.
         </div>
         <div className='flex flex-row pt-4 md:pt-8 gap-4'>
-          <Link href={'/signup'} className='hidden md:flex px-2 py-2 rounded-lg bg-neutral-300 text-[#111111] font-bold text-md font-mono hover:bg-neutral-200'>Get started - it's free</Link>
-          <Link href={'/signup'} className=' px-2 py-2 rounded-lg bg-neutral-800 text-neutral-300 border border-slate-400/20 font-bold text-md font-mono hover:bg-neutral-900'>More about syntax snipp</Link>
+          <Link href={'/signup'} className='hidden md:flex px-4 items-center py-2 rounded-lg bg-neutral-300 text-[#111111] font-bold text-md font-mono hover:bg-neutral-200'>Get started for free</Link>
+          <Link href={'/about'} className=' px-4 py-2 items-center rounded-lg bg-neutral-800 text-neutral-300 border border-slate-400/20 font-bold text-md font-mono hover:bg-neutral-900'>Explore Syntax Snipp</Link>
         </div>
       </div>
     </div>
