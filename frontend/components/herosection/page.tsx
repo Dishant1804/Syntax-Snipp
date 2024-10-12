@@ -5,12 +5,13 @@ import Link from 'next/link';
 
 const HeroSectionComponent = () => {
   return (
-    <div className="flex flex-col w-full justify-center overflow-hidden mt-16 md:mt-20">
-      <Spotlight
-        className="w-[80%] -top-12 left-16 md:-top-48 md:left-96 "
+      <>
+        <Spotlight
+        className="w-[80%] -top-12 left-16 md:-top-96 md:left-96 hidden lg:flex"
         fill="white"
       />
-      <div className="px-6 py-4 md:px-12 flex items-center justify-center text-center w-full md:h-[65vh] flex-col">
+    <div className="flex flex-col w-full justify-center mt-16 md:mt-36">
+      <div className="px-6 py-4 md:px-12 flex items-center justify-center text-center w-full md:h-full flex-col">
         <div className='py-2 text-sm md:text-lg text-center flex flex-wrap justify-center max-w-3xl md:max-w-6xl text-neutral-300 '>
           For&nbsp;<span className='underline'>Developers</span>&nbsp;by a Developer
         </div>
@@ -29,6 +30,7 @@ const HeroSectionComponent = () => {
         </div>
       </div>
     </div>
+      </>
   );
 }
 

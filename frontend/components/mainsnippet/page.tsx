@@ -11,8 +11,9 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+
 
 
 export const MainSnippetComponent = () => {
@@ -96,15 +97,14 @@ export const MainSnippetComponent = () => {
                   onClick={handleFavoriteClick}
                 />
               )}
-              <Pencil className="h-5 w-5 cursor-pointer" onClick={handleEditClick}/>
+              <Pencil className="h-5 w-5 cursor-pointer" onClick={handleEditClick} />
               <AlertDialog>
                 <AlertDialogTrigger><Trash2 className="h-5 w-5 cursor-pointer" /></AlertDialogTrigger>
                 <AlertDialogContent className='bg-[#18181a] border-0'>
                   <AlertDialogHeader>
                     <AlertDialogTitle className='text-white/90'>Are you sure you want to delete this snippet?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will delete your snippet
-                      and remove your data from our servers.
+                    <AlertDialogDescription className='text-neutral-300'>
+                      Delete forever?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

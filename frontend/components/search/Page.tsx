@@ -84,7 +84,7 @@ export const SearchComponent = () => {
   return (
     <div className="flex flex-col h-full text-white/90">
       <div className="flex flex-row justify-between px-10 py-3 text-white/90">
-        <h1 className="text-xl font-medium">Search Snippets</h1>
+        <h1 className="text-xl font-bold">Search Snippets</h1>
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-auto items-center justify-center flex">
           <TabsList className="grid w-auto h-auto grid-cols-2 bg-[#272729]">
             <TabsTrigger value="allsnippets" className="bg-black">All Snippets</TabsTrigger>
@@ -122,7 +122,7 @@ export const SearchComponent = () => {
                   className="h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 hover:bg-[#272729]/30 transition ease-in-out duration-100 cursor-pointer"
                   onClick={() => handleSnippetClick(snippet)}
                 >
-                  <div className="text-lg font-medium flex">{snippet.user.username}</div>
+                  <div className="text-lg font-bold flex">{snippet.user.username}</div>
                   <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
                   <div className="text-sm font-mono mt-4 flex flex-wrap">
                     {truncateDescription(snippet.description, 18)}

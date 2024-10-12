@@ -25,7 +25,7 @@ export const Sidebar = () => {
       <div className='flex flex-col'>
         <div className="flex flex-row gap-3 items-center justify-start py-4 px-6 cursor-pointer">
           <Code />
-          <Link href={'/dashboard'} className="font-medium text-xl">Syntax Snipp</Link>
+          <Link href={'/dashboard'} className="font-bold text-xl">Syntax Snipp</Link>
         </div>
         <Separator className="bg-slate-400/20" />
         <div className="flex my-4 flex-col gap-2 px-6">
