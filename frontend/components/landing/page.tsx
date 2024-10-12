@@ -2,6 +2,7 @@ import NavbarComponent from "@/components/navbar/page";
 import HeroSectionComponent from "../herosection/page";
 import BrowserMockupComponent from "../browsermockup/page";
 import Features from "../features/page";
+import PricingComponent from "../pricing/page";
 
 export default function LandingPage() {
   return (
@@ -11,6 +12,7 @@ export default function LandingPage() {
         <HeroSectionComponent />
         <BrowserMockupComponent />
         <Features />
+        <PricingComponent />
       </div>
     </div>
   );
