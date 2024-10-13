@@ -4,9 +4,11 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Sidebar } from '../sidebar/Page'
 import { SearchComponent } from "../search/Page"
 import { MainSnippetComponent } from "../mainsnippet/page"
+import { useState } from "react"
 
 
 export default function DashboardComponent() {
+  const [isSnippetDeleted , setIsSnippetDeleted] = useState<boolean>(false);
 
   return (
     <>
@@ -17,11 +19,11 @@ export default function DashboardComponent() {
           </ResizablePanel>
           <ResizableHandle className="h-screen bg-slate-400/20 " />
           <ResizablePanel minSize={32} defaultSize={34} maxSize={44} >
-            <SearchComponent />
+            <SearchComponent isSnippetDeleted={isSnippetDeleted} setIsSnippetDeleted={setIsSnippetDeleted} />
           </ResizablePanel>
           <ResizableHandle className="h-screen bg-slate-400/20 " />
           <ResizablePanel minSize={44} defaultSize={48}>
-            <MainSnippetComponent />
+            <MainSnippetComponent setIsSnippetDeleted={setIsSnippetDeleted} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

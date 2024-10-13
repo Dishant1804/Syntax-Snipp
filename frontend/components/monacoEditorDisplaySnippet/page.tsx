@@ -60,7 +60,7 @@ export const MonacoEditorDisplaySnippetComponent = ({ content, language }: Snipp
   return (
     <div className='px-4 mx-6 mt-4 max-h-screen bg-[#1a1a1a] flex flex-col justify-center items-center rounded-xl font-sans'>
       <div className='flex flex-row w-full'>
-        <div className='flex flex-row justify-start gap-3 items-center pt-4 pb-4 pl-3'>
+        <div className='flex flex-row justify-start gap-2 items-center pt-4 pb-4 pl-3'>
           <div className='bg-red-500 h-3 w-3 rounded-full'></div>
           <div className='bg-yellow-500 h-3 w-3 rounded-full'></div>
           <div className='bg-green-500 h-3 w-3 rounded-full'></div>

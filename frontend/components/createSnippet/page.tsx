@@ -22,6 +22,12 @@ const CreateSnippetComponent = () => {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      addTag();
+    }
+  };
+
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
@@ -75,10 +81,11 @@ const CreateSnippetComponent = () => {
                   <Input 
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={handleKeyPress}
                     placeholder="Add tag"
                     className="pl-8 flex items-center text-white/90 border-slate-400/20 h-10 text-md"
                   />
-                  <Button onClick={addTag} className='ml-2 bg-[#272729] text-white/90'>
+                  <Button onClick={addTag} className='ml-2 bg-neutral-700 hover:bg-neutral-800 text-white/90'>
                     Add
                   </Button>
                 </div>

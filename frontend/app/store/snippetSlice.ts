@@ -9,6 +9,7 @@ type Snippet = {
   favorite : boolean;
   user: {
     username: string;
+    email : string;
   };
   tags: string[];
 };

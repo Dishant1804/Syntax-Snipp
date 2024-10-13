@@ -74,7 +74,7 @@ export const Sidebar = () => {
           </Link>
         </div>
         <div className='flex flex-row justify-center items-center text-white/80'>
-          Made with <FontAwesomeIcon icon={faHeart} className='h-4 w-4 px-1'/> by&nbsp; <Link href={'https://github.com/dishant1804/'} className='hover:underline'>Dishant</Link>
+          Made with&nbsp;<FontAwesomeIcon icon={faHeart} className='h-4 w-4 px-1'/>&nbsp;by&nbsp; <Link href={'https://github.com/dishant1804/'} className='hover:underline'>Dishant</Link>
         </div>
       </div>
     </div>

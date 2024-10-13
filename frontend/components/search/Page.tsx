@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { SetStateAction, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ type Snippet = {
   tags: string[];
 };
 
-export const SearchComponent = () => {
+export const SearchComponent = ({isSnippetDeleted , setIsSnippetDeleted} : {isSnippetDeleted : boolean , setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>>}) => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +37,11 @@ export const SearchComponent = () => {
   useEffect(() => {
     fetchSnippets();
   }, [dispatch, activeTab]);
+
+  useEffect(() => {
+    setIsSnippetDeleted(false)
+    fetchSnippets();
+  },[isSnippetDeleted]);
 
   const fetchSnippets = async () => {
     try {
@@ -98,7 +103,7 @@ export const SearchComponent = () => {
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search"
-            className="pl-8 text-white/90 border-slate-400/20"
+            className="pl-8 text-white/90 border-slate-400/20 placeholder:text-neutral-400"
             value={searchItem}
             onChange={(e) => setSearchItem(e.target.value)}
           />

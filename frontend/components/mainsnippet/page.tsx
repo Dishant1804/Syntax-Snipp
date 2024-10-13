@@ -1,11 +1,11 @@
-import { Trash2, Star, Pencil } from 'lucide-react';
+import { Trash2, Star, Pencil, Link, Check, Copy } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { MonacoEditorDisplaySnippetComponent } from '../monacoEditorDisplaySnippet/page';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store/store';
 import { truncateDescription } from '@/helpers/helper';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useRef, useState } from 'react';
 import { SpinnerWithText } from '@/components/ui/spinnerWithText';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -13,17 +13,39 @@ import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from '../ui/button';
 
 
 
-export const MainSnippetComponent = () => {
+export const MainSnippetComponent = ({setIsSnippetDeleted} : {setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>>}) => {
   const [loading, setLoading] = useState<boolean>(true);
   const snippet = useSelector((state: RootState) => state.snippet.selectedSnippet);
   const [isFavorite, setIsFavorite] = useState<boolean>(snippet?.favorite || false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
+  const timeoutRef = useRef<number | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [url, setUrl] = useState<string>('');
+  
+
+  const handleMouseEnter = () => {
+    timeoutRef.current = window.setTimeout(() => {
+      setIsOpen(true);
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+    }
+    setIsOpen(false);
+  };
+
 
   useEffect(() => {
     if (snippet) {
+      const snippetUrl = `http://localhost:3001/sharesnippet/${snippet.id}`;
+      setUrl(snippetUrl);
       setLoading(true);
       setIsFavorite(snippet.favorite);
       const timer = setTimeout(() => {
@@ -32,6 +54,16 @@ export const MainSnippetComponent = () => {
       return () => clearTimeout(timer);
     }
   }, [snippet]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
 
   if (!snippet) {
     return <div className="text-white/90 flex justify-center items-center h-screen">No snippet selected</div>;
@@ -69,6 +101,7 @@ export const MainSnippetComponent = () => {
     })
 
     if (response.data.message === "Snippet deleted") {
+      setIsSnippetDeleted(true);
       router.refresh();
     }
   }
@@ -115,9 +148,31 @@ export const MainSnippetComponent = () => {
               </AlertDialog>
             </div>
             <div className="pr-4">
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-              </Avatar>
+              <Popover open={isOpen} onOpenChange={setIsOpen}>
+                <PopoverTrigger asChild>
+                  <Avatar
+                    className="cursor-pointer"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <AvatarImage src='https://github.com/shadcn.png' alt="User avatar" />
+                  </Avatar>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-80 bg-[#18181a] border-none"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <h1 className="font-bold leading-none text-white/90">{snippet.user.username}</h1>
+                      <p className="text-sm text-muted-foreground text-neutral-300">
+                        {snippet.user.email}
+                      </p>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <Separator className="bg-slate-400/20" />
@@ -127,8 +182,8 @@ export const MainSnippetComponent = () => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="font-semibold text-xl font-mono">
-                {snippet.user.username}
+              <h1 className="font-semibold text-xl font-mono flex flex-row w-full">
+                <h1>{snippet.user.username}</h1>
               </h1>
               <p className="text-md mt-2">{snippet.title}</p>
               <p className="text-sm mt-1 font-mono">
@@ -136,6 +191,23 @@ export const MainSnippetComponent = () => {
                   ? truncateDescription(snippet.description, 30)
                   : ""}
               </p>
+            </div>
+          </div>
+          <Separator className="bg-slate-400/20" />
+          <div className='w-full flex justify-center px-4 py-4'>
+            <div className='w-full flex flex-row bg-[#1a1a1a] items-center rounded-md overflow-hidden'>
+              <div className='flex-grow flex items-center px-3 py-2'>
+                <Link className='h-4 w-4 mr-2 text-white' />
+                <h1 className='text-white truncate'>{url}</h1>
+              </div>
+              <Button
+                onClick={handleCopy}
+                variant="ghost"
+                size="icon"
+                className='h-full aspect-square bg-neutral-700 hover:bg-neutral-700 rounded-none'
+              >
+                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-white" />}
+              </Button>
             </div>
           </div>
           <Separator className="bg-slate-400/20" />

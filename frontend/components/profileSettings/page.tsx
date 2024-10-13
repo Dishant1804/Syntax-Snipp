@@ -16,7 +16,7 @@ const ProfileSettingsSidebar = ({ setOption }: { setOption: React.Dispatch<React
             <User className="h-5 w-5" />
             <h1>Account</h1>
           </div>
-          <div className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer"
+          <div className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer hidden"
             onClick={() => setOption("theme")}>
             <PaintbrushVertical className="h-5 w-5" />
             <h1>Theme</h1>
