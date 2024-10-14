@@ -9,6 +9,7 @@ import { useState } from "react"
 
 export default function DashboardComponent() {
   const [isSnippetDeleted , setIsSnippetDeleted] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<"allsnippets" | "mysnippets">("allsnippets");
 
   return (
     <>
@@ -19,11 +20,11 @@ export default function DashboardComponent() {
           </ResizablePanel>
           <ResizableHandle className="h-screen bg-slate-400/20 " />
           <ResizablePanel minSize={32} defaultSize={34} maxSize={44} >
-            <SearchComponent isSnippetDeleted={isSnippetDeleted} setIsSnippetDeleted={setIsSnippetDeleted} />
+            <SearchComponent isSnippetDeleted={isSnippetDeleted} setIsSnippetDeleted={setIsSnippetDeleted} setActiveTab={setActiveTab} />
           </ResizablePanel>
           <ResizableHandle className="h-screen bg-slate-400/20 " />
           <ResizablePanel minSize={44} defaultSize={48}>
-            <MainSnippetComponent setIsSnippetDeleted={setIsSnippetDeleted} />
+            <MainSnippetComponent setIsSnippetDeleted={setIsSnippetDeleted} activeTab={activeTab} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

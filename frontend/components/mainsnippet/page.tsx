@@ -17,7 +17,7 @@ import { Button } from '../ui/button';
 
 
 
-export const MainSnippetComponent = ({setIsSnippetDeleted} : {setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>>}) => {
+export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const snippet = useSelector((state: RootState) => state.snippet.selectedSnippet);
   const [isFavorite, setIsFavorite] = useState<boolean>(snippet?.favorite || false);
@@ -26,7 +26,7 @@ export const MainSnippetComponent = ({setIsSnippetDeleted} : {setIsSnippetDelete
   const timeoutRef = useRef<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [url, setUrl] = useState<string>('');
-  
+
 
   const handleMouseEnter = () => {
     timeoutRef.current = window.setTimeout(() => {
@@ -129,22 +129,26 @@ export const MainSnippetComponent = ({setIsSnippetDeleted} : {setIsSnippetDelete
                   onClick={handleFavoriteClick}
                 />
               )}
-              <Pencil className="h-5 w-5 cursor-pointer" onClick={handleEditClick} />
-              <AlertDialog>
-                <AlertDialogTrigger><Trash2 className="h-5 w-5 cursor-pointer" /></AlertDialogTrigger>
-                <AlertDialogContent className='bg-[#18181a] border-0'>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className='text-white/90'>Are you sure you want to delete this snippet?</AlertDialogTitle>
-                    <AlertDialogDescription className='text-neutral-300'>
-                      Delete forever?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteClick}>Confirm</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              {activeTab === "mysnippets" && (
+                <>
+                  <Pencil className="h-5 w-5 cursor-pointer" onClick={handleEditClick} />
+                  <AlertDialog>
+                    <AlertDialogTrigger><Trash2 className="h-5 w-5 cursor-pointer" /></AlertDialogTrigger>
+                    <AlertDialogContent className='bg-[#18181a] border-0'>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className='text-white/90'>Are you sure you want to delete this snippet?</AlertDialogTitle>
+                        <AlertDialogDescription className='text-neutral-300'>
+                          Delete forever?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteClick}>Confirm</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              )}
             </div>
             <div className="pr-4">
               <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -176,7 +180,7 @@ export const MainSnippetComponent = ({setIsSnippetDeleted} : {setIsSnippetDelete
           </div>
           <Separator className="bg-slate-400/20" />
           <div className="mt-4 mb-4 px-6 flex flex-row gap-6 items-center">
-            <Avatar className="h-12 w-12 bg-slate-400/20">
+            <Avatar className="h-12 w-12 bg-slate-400/20" onClick={() => router.push('')}>
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>

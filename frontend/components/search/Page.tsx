@@ -22,26 +22,26 @@ type Snippet = {
   tags: string[];
 };
 
-export const SearchComponent = ({isSnippetDeleted } : {isSnippetDeleted : boolean , setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>>}) => {
+export const SearchComponent = ({isSnippetDeleted , setActiveTab } : {isSnippetDeleted : boolean , setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>> ,setActiveTab: React.Dispatch<SetStateAction<"allsnippets" | "mysnippets">>;}) => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchItem, setSearchItem] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"allsnippets" | "mysnippets">("allsnippets");
+  const [activeTabInternal, setActiveTabInternal] = useState<"allsnippets" | "mysnippets">("allsnippets");
 
   const debouncedSearchTerm = useDebounce(searchItem, 300);
   const dispatch = useDispatch();
 
   useEffect(() => {
     fetchSnippets();
-  }, [dispatch, activeTab, isSnippetDeleted]);
+  }, [dispatch, activeTabInternal, isSnippetDeleted]);
 
   
   const fetchSnippets = async () => {
     try {
       setLoading(true);
       setError(null);
-      const endpoint = activeTab === "allsnippets" 
+      const endpoint = activeTabInternal === "allsnippets" 
         ? 'http://localhost:3000/api/v1/snippet/displayallsnippets'
         : 'http://localhost:3000/api/v1/snippet/mysnippets';
       const response = await axios.get(endpoint, {
@@ -77,6 +77,7 @@ export const SearchComponent = ({isSnippetDeleted } : {isSnippetDeleted : boolea
   };
 
   const handleTabChange = (value: string) => {
+    setActiveTabInternal(value as "allsnippets" | "mysnippets");
     setActiveTab(value as "allsnippets" | "mysnippets");
   };
 
@@ -84,7 +85,7 @@ export const SearchComponent = ({isSnippetDeleted } : {isSnippetDeleted : boolea
     <div className="flex flex-col h-full text-white/90">
       <div className="flex flex-row justify-between px-10 py-3 text-white/90">
         <h1 className="text-xl font-bold">Search Snippets</h1>
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-auto items-center justify-center flex">
+        <Tabs value={activeTabInternal} onValueChange={handleTabChange} className="w-auto items-center justify-center flex">
           <TabsList className="grid w-auto h-auto grid-cols-2 bg-[#272729]">
             <TabsTrigger value="allsnippets" className="bg-black">All Snippets</TabsTrigger>
             <TabsTrigger value="mysnippets" className="bg-black">My Snippets</TabsTrigger>
