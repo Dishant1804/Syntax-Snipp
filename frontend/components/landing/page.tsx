@@ -11,7 +11,7 @@ export default function LandingPage() {
   return (
     <div className="bg-[#111111] relative h-full text-white/90 overflow-hidden">
       <div className="flex flex-col">
-        <NavbarComponent />
+        <NavbarComponent isShareSnippet={false} />
         <HeroSectionComponent />
         <BrowserMockupComponent />
         <Features />

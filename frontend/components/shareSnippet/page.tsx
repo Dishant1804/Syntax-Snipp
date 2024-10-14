@@ -57,7 +57,7 @@ const ShareSnippetComponent: React.FC = () => {
 
   return (
     <div className="w-screen bg-[#111111] text-white/90 h-screen flex flex-col items-center">
-      <NavbarComponent />
+      <NavbarComponent isShareSnippet={true}/>
       {loading ? <>
         <div className="flex justify-center items-center h-screen">
           <SpinnerWithText />
@@ -86,7 +86,7 @@ const ShareSnippetComponent: React.FC = () => {
                 </div>
               </div>
               <div>
-                <h2 className="text-2xl font-semibold mb-2">Author</h2>
+                <h2 className="text-2xl font-semibold mb-2">Created By</h2>
                 <p className="text-lg">{snippet.user.username}</p>
               </div>
             </div>
