@@ -1,5 +1,3 @@
-"use client";
-
 import { SetStateAction, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Search } from "lucide-react";
@@ -10,9 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { SpinnerWithText } from "../ui/spinnerWithText";
 import { useDebounce } from "@/hooks/useDebounce";
 import { truncateTitle, truncateDescription } from "@/helpers/helper";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setSelectedSnippet } from "../../app/store/snippetSlice";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Snippet = {
   id: string;
@@ -24,7 +22,7 @@ type Snippet = {
   tags: string[];
 };
 
-export const SearchComponent = ({isSnippetDeleted , setIsSnippetDeleted} : {isSnippetDeleted : boolean , setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>>}) => {
+export const SearchComponent = ({isSnippetDeleted } : {isSnippetDeleted : boolean , setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>>}) => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,13 +34,9 @@ export const SearchComponent = ({isSnippetDeleted , setIsSnippetDeleted} : {isSn
 
   useEffect(() => {
     fetchSnippets();
-  }, [dispatch, activeTab]);
+  }, [dispatch, activeTab, isSnippetDeleted]);
 
-  useEffect(() => {
-    setIsSnippetDeleted(false)
-    fetchSnippets();
-  },[isSnippetDeleted]);
-
+  
   const fetchSnippets = async () => {
     try {
       setLoading(true);

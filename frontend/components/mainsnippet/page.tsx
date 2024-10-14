@@ -100,9 +100,8 @@ export const MainSnippetComponent = ({setIsSnippetDeleted} : {setIsSnippetDelete
       withCredentials: true,
     })
 
-    if (response.data.message === "Snippet deleted") {
-      setIsSnippetDeleted(true);
-      router.refresh();
+    if (response.data.message === "Snippet deleted" || response.data.success === true) {
+      setIsSnippetDeleted((prev) => !prev);
     }
   }
 
