@@ -136,7 +136,7 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
       tags: snippet.tags.map(tagRelation => tagRelation.tag.name),
     };
 
-    return res.status(200).json({ snippet: formattedSnippet });
+    return res.status(200).json({ snippet: formattedSnippet , success : true });
   }
   catch (e) {
     console.log(e);
@@ -367,7 +367,7 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
       }
     });
 
-    return res.status(200).json({ message: 'Snippet updated successfully', snippet: updatedSnippet });
+    return res.status(200).json({ message: 'Snippet updated successfully', snippet: updatedSnippet, success : true });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ "error": "Internal server error" });
