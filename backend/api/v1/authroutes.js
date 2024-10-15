@@ -363,12 +363,13 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    sameSite: "lax",
+  res.cookie("token", "" , {
+    httpOnly: true, 
+    sameSite: "Lax",
   });
-  res.json({ message: "Logged out successfully" });
+  res.json({ message: "Logged out successfully", success: true });
 });
+
 
 export default router;
 
