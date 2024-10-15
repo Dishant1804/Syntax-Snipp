@@ -15,7 +15,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from '../ui/button';
 
-
+interface UserProfile {
+  username: string;
+  email: string;
+}
 
 export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" }) => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,7 +29,26 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
   const timeoutRef = useRef<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [url, setUrl] = useState<string>('');
+  const [profile, setProfile] = useState<UserProfile | null>(null);
 
+  useEffect(() => {
+    fetchProfile();
+  }, [])
+
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/v1/auth//user/profile", {
+        withCredentials: true,
+      });
+
+      if (response.data.success && response.data.status === "retrieved") {
+        setProfile(response.data.profile)
+      }
+    }
+    catch (e) {
+      console.log(e);
+    }
+  }
 
   const handleMouseEnter = () => {
     timeoutRef.current = window.setTimeout(() => {
@@ -168,10 +190,12 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
                 >
                   <div className="grid gap-4">
                     <div className="space-y-2">
-                      <h1 className="font-bold leading-none text-white/90">{snippet.user.username}</h1>
-                      <p className="text-sm text-muted-foreground text-neutral-300">
-                        {snippet.user.email}
-                      </p>
+                      {profile && <>
+                        <h1 className="font-bold leading-none text-white/90">{profile.username}</h1>
+                        <p className="text-sm text-muted-foreground text-neutral-300">
+                          {profile.email}
+                        </p>
+                      </>}
                     </div>
                   </div>
                 </PopoverContent>
