@@ -1,5 +1,7 @@
-import React from 'react';
-import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Flame, Bookmark } from "lucide-react";
+"use client"
+
+import React, { useState } from 'react';
+import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Flame, Bookmark, Check } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
@@ -7,6 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faLinkedinIn, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { Button } from '../ui/button';
+import axios from 'axios';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const languages = [
   "JavaScript", "TypeScript", "Java", "Python", "C", "C++",
@@ -14,10 +19,92 @@ const languages = [
   "NextJs", "ExpressJs"
 ];
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+
 export const Sidebar = () => {
-  const handleClick = (language: string) => {
-    console.log(`Clicked: ${language}`);
-    // Add the axios call to backend to fetch the snippets based on languages
+  const [responseId, setResponseId] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const loadScript = (src: string) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const createRazorpayOrder = async (amount: number) => {
+    let data = JSON.stringify({
+      amount: amount * 100,
+      currency: "INR"
+    });
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "http://localhost:3000/api/v1/payments/orders",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
+
+    axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        handleRazorpayScreen(response.data.amount);
+      })
+      .catch((error) => {
+        console.log("error at", error);
+      });
+  };
+
+  const handleRazorpayScreen = async (amount: number) => {
+    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+
+    if (!res) {
+      alert("Some error at razorpay screen loading");
+      return;
+    }
+
+    const options = {
+      key: 'rzp_test_fOkl8NGPmGodzi',
+      amount: amount,
+      currency: 'INR',
+      name: "Syntax Snipp",
+      description: "Upgrade to Pro",
+      image: "https://papayacoders.com/demo.png",
+      handler: function (response: any) {
+        setResponseId(response.razorpay_payment_id);
+        alert("Payment successful! Your payment ID is: " + response.razorpay_payment_id);
+      },
+      prefill: {
+        name: "Syntax Snipp User",
+        email: "user@syntaxsnipp.com"
+      },
+      theme: {
+        color: "#272729"
+      }
+    };
+
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  };
+
+  const handleUpgradeClick = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleAvailNowClick = () => {
+    setIsDialogOpen(false);
+    createRazorpayOrder(999);
   };
 
   return (
@@ -34,7 +121,6 @@ export const Sidebar = () => {
             { icon: Star, text: "Favorites", redirectUri: '/favorites' },
             { icon: MessageSquareDiff, text: "Create Snippet", redirectUri: '/createsnippet' },
             { icon: SquareUser, text: "Profile", redirectUri: '/profile' },
-            { icon: Flame, text: "Upgrade to Pro", redirectUri: '/upgradetopro' }
           ].map(({ icon: Icon, text, redirectUri }) => (
             <Link href={`http://localhost:3001${redirectUri}`} key={text} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
               <Icon className="h-5 w-5" />
@@ -51,11 +137,18 @@ export const Sidebar = () => {
                 key={language}
                 variant="secondary"
                 className="bg-[#272729] text-white/90 hover:text-black rounded-xl text-sm font-normal cursor-pointer"
-                onClick={() => handleClick(language)}
               >
                 {language}
               </Badge>
             ))}
+          </div>
+        </div>
+        <Separator className="bg-slate-400/20" />
+        <div className='my-12 flex flex-col px-4'>
+          <div className='border border-slate-400/20 rounded-lg p-4'>
+            <h1 className='text-xl font-bold'>Upgrade to Pro</h1>
+            <h3 className='text-sm py-3'>Unlock unlimited snippets with advanced organization support!</h3>
+            <Button className='bg-[#272729]' onClick={handleUpgradeClick}>Checkout features</Button>
           </div>
         </div>
       </div>
@@ -74,9 +167,32 @@ export const Sidebar = () => {
           </Link>
         </div>
         <div className='flex flex-row justify-center items-center text-white/80'>
-          Made with&nbsp;<FontAwesomeIcon icon={faHeart} className='h-4 w-4 px-1'/>&nbsp;by&nbsp; <Link href={'https://github.com/dishant1804/'} className='hover:underline'>Dishant</Link>
+          Made with&nbsp;<FontAwesomeIcon icon={faHeart} className='h-4 w-4 px-1' />&nbsp;by&nbsp; <Link href={'https://github.com/dishant1804/'} className='hover:underline'>Dishant</Link>
         </div>
       </div>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className='bg-[#1a1a1a] border-none text-white/90 w-full max-w-xl'>
+          <DialogHeader>
+            <DialogTitle className='text-2xl'>Upgrade to Pro</DialogTitle>
+            <DialogDescription>
+              Unlock the full potential of Syntax Snipp with our Pro plan!
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <h3 className="font-semibold mb-2">Pro Features:</h3>
+            <ul className="space-y-1">
+              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Unlimited code snippets</li>
+              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Advanced organization tools</li>
+              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Priority support</li>
+              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Private snippets</li>
+              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Collaboration features</li>
+            </ul>
+          </div>
+          <div className="flex justify-center">
+            <Button onClick={handleAvailNowClick} className='bg-neutral-700 hover:bg-neutral-800'>Avail Now</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

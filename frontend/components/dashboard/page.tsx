@@ -1,7 +1,7 @@
 "use client"
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
-import { Sidebar } from '../sidebar/Page'
+import { Sidebar }  from '@/components/sidebar/Page'
 import { SearchComponent } from "../search/Page"
 import { MainSnippetComponent } from "../mainsnippet/page"
 import { useState } from "react"
