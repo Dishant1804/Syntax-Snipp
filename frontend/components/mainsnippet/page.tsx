@@ -128,7 +128,8 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
   }
 
   const handleEditClick = () => {
-    router.push('/editsnippet')
+    const id = snippet.id
+    router.push(`/editsnippet/${id}`)
   }
 
   return (
