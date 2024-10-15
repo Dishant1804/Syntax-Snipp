@@ -37,7 +37,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/auth//user/profile", {
+      const response = await axios.get("http://localhost:3000/api/v1/auth/user/profile", {
         withCredentials: true,
       });
 
