@@ -1,6 +1,6 @@
 import { Code, Database, Save, FolderOpen, RefreshCw, Tag, Code2, Link, Share2 } from "lucide-react";
 import Image from "next/image";
-import testimage from '@/utils/screenshot-files@2x.png'
+import testimage from '@/utils/snippet.png'
 import shareImage from '@/utils/shareImage.png'
 import OrbitingCircles from "../ui/orbiting-circles";
 import Icons from "@/helpers/icons";

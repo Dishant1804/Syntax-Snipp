@@ -1,7 +1,7 @@
 import React from 'react';
 import { RotateCcw, Search } from "lucide-react";
 import Image from 'next/image';
-import siteImage from '../../utils/image.png'
+import siteImage from '../../utils/screenshot.png'
 
 const BrowserMockupComponent = () => {
   return (
@@ -21,11 +21,11 @@ const BrowserMockupComponent = () => {
             </div>
           </div>
         </div>
-        <div className="relative w-full h-0 pb-[56.25%]">
+        <div className="relative w-full p-1">
           <Image
             src={siteImage}
             alt="Site preview"
-            layout="fill"
+            layout="cover"
             objectFit="cover"
           />
         </div>
