@@ -22,12 +22,13 @@ type Snippet = {
   tags: string[];
 };
 
-export const SearchComponent = ({isSnippetDeleted , setActiveTab } : {isSnippetDeleted : boolean , setIsSnippetDeleted : React.Dispatch<SetStateAction<boolean>> ,setActiveTab: React.Dispatch<SetStateAction<"allsnippets" | "mysnippets">>;}) => {
+export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetDeleted: boolean, setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, setActiveTab: React.Dispatch<SetStateAction<"allsnippets" | "mysnippets">>; }) => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchItem, setSearchItem] = useState<string>("");
   const [activeTabInternal, setActiveTabInternal] = useState<"allsnippets" | "mysnippets">("allsnippets");
+  const [selectedSnippetId, setSelectedSnippetId] = useState<string | null>(null);
 
   const debouncedSearchTerm = useDebounce(searchItem, 300);
   const dispatch = useDispatch();
@@ -36,12 +37,12 @@ export const SearchComponent = ({isSnippetDeleted , setActiveTab } : {isSnippetD
     fetchSnippets();
   }, [dispatch, activeTabInternal, isSnippetDeleted]);
 
-  
+
   const fetchSnippets = async () => {
     try {
       setLoading(true);
       setError(null);
-      const endpoint = activeTabInternal === "allsnippets" 
+      const endpoint = activeTabInternal === "allsnippets"
         ? 'http://localhost:3000/api/v1/snippet/displayallsnippets'
         : 'http://localhost:3000/api/v1/snippet/mysnippets';
       const response = await axios.get(endpoint, {
@@ -52,6 +53,7 @@ export const SearchComponent = ({isSnippetDeleted , setActiveTab } : {isSnippetD
 
       if (fetchedSnippets.length > 0) {
         dispatch(setSelectedSnippet(fetchedSnippets[0]));
+        setSelectedSnippetId(fetchedSnippets[0].id);
       }
     } catch (e) {
       console.error(e);
@@ -74,8 +76,8 @@ export const SearchComponent = ({isSnippetDeleted , setActiveTab } : {isSnippetD
   const handleSnippetClick = (snippet: Snippet) => {
     //@ts-ignore
     dispatch(setSelectedSnippet(snippet));
+    setSelectedSnippetId(snippet.id);
   };
-
   const handleTabChange = (value: string) => {
     setActiveTabInternal(value as "allsnippets" | "mysnippets");
     setActiveTab(value as "allsnippets" | "mysnippets");
@@ -87,8 +89,8 @@ export const SearchComponent = ({isSnippetDeleted , setActiveTab } : {isSnippetD
         <h1 className="text-xl font-bold">Search Snippets</h1>
         <Tabs value={activeTabInternal} onValueChange={handleTabChange} className="w-auto items-center justify-center flex">
           <TabsList className="grid w-auto h-auto grid-cols-2 bg-[#272729]">
-            <TabsTrigger value="allsnippets" className="bg-black">All Snippets</TabsTrigger>
-            <TabsTrigger value="mysnippets" className="bg-black">My Snippets</TabsTrigger>
+            <TabsTrigger value="allsnippets" className="text-white/60 bg-[#1a1a1a]">All Snippets</TabsTrigger>
+            <TabsTrigger value="mysnippets" className="text-white/60 bg-[#1a1a1a]">My Snippets</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -119,7 +121,10 @@ export const SearchComponent = ({isSnippetDeleted , setActiveTab } : {isSnippetD
               filteredSnippets.map((snippet) => (
                 <div
                   key={snippet.id}
-                  className="h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 hover:bg-[#272729]/30 transition ease-in-out duration-100 cursor-pointer"
+                  className={`h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 transition ease-in-out duration-100 cursor-pointer ${selectedSnippetId === snippet.id
+                      ? "bg-[#1a1a1a]/90 border-neutral-500/50"
+                      : "hover:bg-[#272729]/30"
+                    }`}
                   onClick={() => handleSnippetClick(snippet)}
                 >
                   <div className="text-lg font-bold flex">{snippet.user.username}</div>

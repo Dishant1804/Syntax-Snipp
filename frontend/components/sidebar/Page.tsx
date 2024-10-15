@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Flame, Bookmark, Check } from "lucide-react";
+import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Flame, Bookmark, Check, LogOut } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
@@ -11,7 +11,8 @@ import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faLinkedinIn, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { Button } from '../ui/button';
 import axios from 'axios';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useRouter } from 'next/navigation';
 
 const languages = [
   "JavaScript", "TypeScript", "Java", "Python", "C", "C++",
@@ -29,6 +30,8 @@ declare global {
 export const Sidebar = () => {
   const [responseId, setResponseId] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const router = useRouter()
 
   const loadScript = (src: string) => {
     return new Promise((resolve) => {
@@ -80,14 +83,9 @@ export const Sidebar = () => {
       currency: 'INR',
       name: "Syntax Snipp",
       description: "Upgrade to Pro",
-      image: "https://papayacoders.com/demo.png",
       handler: function (response: any) {
         setResponseId(response.razorpay_payment_id);
         alert("Payment successful! Your payment ID is: " + response.razorpay_payment_id);
-      },
-      prefill: {
-        name: "Syntax Snipp User",
-        email: "user@syntaxsnipp.com"
       },
       theme: {
         color: "#272729"
@@ -106,6 +104,15 @@ export const Sidebar = () => {
     setIsDialogOpen(false);
     createRazorpayOrder(999);
   };
+  
+  const handleLogoutClick = () => {
+    setIsLogoutDialogOpen(true);
+  };
+  
+  const handleLogoutConfirm = () => {
+    setIsLogoutDialogOpen(false);
+    router.push('/logout');
+  };
 
   return (
     <div className="w-full h-screen flex flex-col justify-between text-white/90">
@@ -121,11 +128,19 @@ export const Sidebar = () => {
             { icon: Star, text: "Favorites", redirectUri: '/favorites' },
             { icon: MessageSquareDiff, text: "Create Snippet", redirectUri: '/createsnippet' },
             { icon: SquareUser, text: "Profile", redirectUri: '/profile' },
-          ].map(({ icon: Icon, text, redirectUri }) => (
-            <Link href={`http://localhost:3001${redirectUri}`} key={text} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
-              <Icon className="h-5 w-5" />
-              <h1>{text}</h1>
-            </Link>
+            { icon: LogOut, text: "Logout", onClick: handleLogoutClick },
+          ].map(({ icon: Icon, text, redirectUri, onClick }) => (
+            onClick ? (
+              <div key={text} onClick={onClick} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
+                <Icon className="h-5 w-5" />
+                <h1>{text}</h1>
+              </div>
+            ) : (
+              <Link href={`http://localhost:3001${redirectUri}`} key={text} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
+                <Icon className="h-5 w-5" />
+                <h1>{text}</h1>
+              </Link>
+            )
           ))}
         </div>
         <Separator className="bg-slate-400/20" />
@@ -144,7 +159,7 @@ export const Sidebar = () => {
           </div>
         </div>
         <Separator className="bg-slate-400/20" />
-        <div className='my-12 flex flex-col px-4'>
+        <div className='my-6 flex flex-col px-4'>
           <div className='border border-slate-400/20 rounded-lg p-4'>
             <h1 className='text-xl font-bold'>Upgrade to Pro</h1>
             <h3 className='text-sm py-3'>Unlock unlimited snippets with advanced organization support!</h3>
@@ -191,6 +206,24 @@ export const Sidebar = () => {
           <div className="flex justify-center">
             <Button onClick={handleAvailNowClick} className='bg-neutral-700 hover:bg-neutral-800'>Avail Now</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+        <DialogContent className='bg-[#1a1a1a] border-none text-white/90 w-full max-w-md'>
+          <DialogHeader>
+            <DialogTitle className='text-xl'>Confirm Logout</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to log out of your account?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-start">
+            <Button type="button" variant="secondary" onClick={() => setIsLogoutDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" variant="destructive" onClick={handleLogoutConfirm}>
+              Logout
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
