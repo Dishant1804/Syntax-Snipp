@@ -53,7 +53,52 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
 });
 
 /**
- * Display the snippet with a particular ID
+ * Display the shareable snippet with a particular ID
+ */
+router.get('/sharesnippet/:id', SnippetLimiter, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const snippet = await prisma.snippet.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+          }
+        },
+        tags: {
+          select: {
+            tag: {
+              select: {
+                name: true,
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!snippet) {
+      return res.status(404).json({ "message": "Snippet not found" });
+    }
+
+    const formattedSnippet = {
+      ...snippet,
+      tags: snippet.tags.map(tagRelation => tagRelation.tag.name),
+    };
+
+    return res.status(200).json({ snippet: formattedSnippet });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ "error": "Internal server error" });
+  }
+});
+
+/**
+ * Display the snippet with a particular ID protected
  */
 router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, res) => {
   const { id } = req.params;
@@ -67,6 +112,7 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
         user: {
           select: {
             username: true,
+            email : true,
           }
         },
         tags: {
@@ -109,6 +155,7 @@ router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, re
         user: {
           select: {
             username: true,
+            email : true,
           }
         },
         tags: {
@@ -156,6 +203,7 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
         user: {
           select: {
             username: true,
+            email : true,
           }
         },
         tags: {
@@ -214,7 +262,7 @@ router.delete('/deletesnippet/:id', authMiddleware, SnippetLimiter, async (req, 
       }
     })
 
-    return res.status(200).json({ "messae": "Snippet deleted" });
+    return res.status(200).json({ "messae": "Snippet deleted" , "success" : true });
   }
   catch (e) {
     console.log(e);
