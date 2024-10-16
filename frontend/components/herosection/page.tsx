@@ -18,7 +18,7 @@ const HeroSectionComponent = () => {
         <div className="text-4xl font-bold md:text-7xl text-center md:font-bold md:text-start flex flex-wrap max-w-3xl md:max-w-6xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
           <div className='flex flex-warp text-center flex-col'>
             <h1>Unleash your coding superpowers with</h1>
-            <BlurIn word='Syntax Snipp' duration={2} className='text-4xl md:text-7xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 py-2 inline-block pointer-events-none ' />
+            <BlurIn word='Syntax Snipp' duration={2} className='text-4xl md:text-7xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 py-1 inline-block pointer-events-none ' />
           </div>
         </div>
         <div className='flex md:text-xl pt-4 md:pt-8 text-neutral-300 max-w-2xl md:max-w-4xl'>

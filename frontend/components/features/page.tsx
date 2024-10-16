@@ -28,7 +28,7 @@ const Features = () => {
             </li>
           </ul>
         </div>
-        <Image src={testimage} height={500} width={500} alt="" objectFit="fill" />
+        <Image src={testimage} height={500} width={500} alt="" style={{objectFit : "fill"}} />
       </div>
       <div className="flex flex-col gap-4 lg:flex-row w-full justify-between items-center md:px-8 mt-8">
         <div className="relative hidden md:flex h-[420px] w-[420px] flex-col items-center justify-center overflow-hidden bg-transparent">
@@ -89,7 +89,7 @@ const Features = () => {
             </li>
           </ul>
         </div>
-        <Image src={orbitImage} objectFit="fill" alt="" className="md:hidden"/>
+        <Image src={orbitImage} style={{objectFit : "fill"}} alt="" className="md:hidden"/>
       </div>
       <div className="flex flex-col gap-4 lg:flex-row w-full justify-between items-center md:px-8 md:py-24">
         <div className="flex flex-col">
@@ -108,7 +108,7 @@ const Features = () => {
           </li>
         </ul>
         </div>
-        <Image src={shareImage} height={400} width={400} alt="" objectFit="fill" />
+        <Image src={shareImage} height={400} width={400} alt="" style={{objectFit : "fill"}} />
       </div>
     </div>
   </div>
