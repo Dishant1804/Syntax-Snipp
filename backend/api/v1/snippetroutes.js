@@ -16,7 +16,7 @@ const SnippetLimiter = rateLimit({
  * Create a new snippet
  */
 router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) => {
-  const { title, content, description, tags, favorite, language } = req.body;
+  const { title, content, description, tags, favorite, language, isPrivate } = req.body;
 
   if (!title || !content || !description) {
     return res.status(400).json({ "error": "Title , content and description are required" });
@@ -31,6 +31,7 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
         userId: req.user.userId,
         favorite: favorite,
         language: language,
+        isPrivate : isPrivate,
         tags: {
           create: tags.map(tagName => ({
             tag: {
@@ -226,6 +227,9 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
       favorite: snippet.favorite,
       user : snippet.user,
       language : snippet.language,
+      createdAt : snippet.createdAt,
+      updatedAt : snippet.updatedAt,
+      isPrivate : snippet.isPrivate,
       tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
     }));
 
@@ -276,7 +280,7 @@ router.delete('/deletesnippet/:id', authMiddleware, SnippetLimiter, async (req, 
 router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, res) => {
   const { id } = req.params;
   const userId = req.user.userId;
-  const { title, description, content, favorite, tags, language } = req.body;
+  const { title, description, content, favorite, tags, language, isPrivate } = req.body;
 
   try {
     const toUpdateSnippet = await prisma.snippet.findFirst({
@@ -325,6 +329,13 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
         return res.status(400).json({ "error": "Content must be a non-empty string" });
       }
       updateData.language = language.trim();
+    }
+
+    if (isPrivate !== undefined) {
+      if (typeof isPrivate !== 'boolean') {
+        return res.status(400).json({ "error": "isprivate must be a boolean" });
+      }
+      updateData.isPrivate = isPrivate;
     }
 
     if (favorite !== undefined) {

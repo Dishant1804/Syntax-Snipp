@@ -316,7 +316,15 @@ router.patch('/updateprofile', signInLimiter, authMiddleware, signInLimiter, asy
         data: updateData,
       });
 
-      return res.status(200).json({ status: "updated", success: true });
+      const updatedUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      return res.status(200).json({ status: "updated", success: true, createdAt: updatedUser.createdAt, updatedAt: updatedUser.updatedAt });
     } else {
       return res
         .status(400)
@@ -344,6 +352,8 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
         email: true,
         isGoogle: true,
         isGithub: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 

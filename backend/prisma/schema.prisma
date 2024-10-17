@@ -17,6 +17,8 @@ model User {
   isGoogle     Boolean   @default(false)
   isGithub     Boolean   @default(false)
   snippets     Snippet[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Snippet {
@@ -29,6 +31,9 @@ model Snippet {
   favorite    Boolean      @default(false)
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   tags        SnippetTag[]
+  isPrivate   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Tag {
