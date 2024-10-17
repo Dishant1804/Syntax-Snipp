@@ -40,7 +40,7 @@ const PricingComponent = () => {
             "Syntax highlighting",
             "Public snippets"
           ], false, handleFreeClick)}
-          {renderPricingCard("Pro", "Unlock the superpowers", "$9.99", [
+          {renderPricingCard("Pro", "Unlock the superpowers", "$3.99", [
             "Unlimited code snippets",
             "Advanced organization",
             "Priority support",
@@ -68,7 +68,7 @@ const renderPricingCard = (title: string, subtitle: string, price: string, featu
       {isPro && <Badge className="mb-2 bg-neutral-700">Most Popular</Badge>}
       <p className="text-sm text-neutral-300 mb-4">{subtitle}</p>
       <div className="font-bold text-2xl mb-4 md:text-3xl">
-        {price}<span className="text-sm md:text-lg text-neutral-300">/month</span>
+        {price}<span className="text-sm md:text-md text-neutral-300">/month</span>
       </div>
       <Separator className="bg-slate-400/40 mb-6"/>
       <ul className="mb-6 space-y-3">

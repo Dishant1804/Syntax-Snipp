@@ -12,6 +12,9 @@ type Snippet = {
     email : string;
   };
   tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  isPrivate: boolean;
 };
 
 interface SnippetState {

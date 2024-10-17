@@ -1,4 +1,4 @@
-import { Trash2, Star, Pencil, Link, Check, Copy } from 'lucide-react';
+import { Trash2, Star, Pencil, Link, Check, Copy, LockKeyholeIcon, LockKeyholeOpen } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { MonacoEditorDisplaySnippetComponent } from '../monacoEditorDisplaySnippet/page';
@@ -14,6 +14,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from '../ui/button';
+import { formatDate } from '@/helpers/helper'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface UserProfile {
   username: string;
@@ -62,6 +64,15 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
     }
     setIsOpen(false);
   };
+
+  useEffect(() => {
+    if (snippet) {
+      console.log('Created At:', snippet.createdAt);
+      console.log('Updated At:', snippet.updatedAt);
+      console.log('Created At Type:', typeof snippet.createdAt);
+      console.log('Updated At Type:', typeof snippet.updatedAt);
+    }
+  }, [snippet, activeTab]);
 
 
   useEffect(() => {
@@ -209,12 +220,40 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <div>
-              <h1 className="font-semibold text-xl font-mono flex flex-row w-full">
-                <h1>{snippet.user.username}</h1>
-              </h1>
-              <p className="text-md mt-2">{snippet.title}</p>
-              <p className="text-sm mt-1 font-mono">
+            <div className='w-full'>
+              <div className="flex flex-row w-full items-center justify-between">
+                <div className='font-bold text-xl flex'>{snippet.user.username}</div>
+                <div className='flex flex-row gap-3 items-center'>
+                  {activeTab === 'mysnippets' && (
+                    snippet.isPrivate ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger><LockKeyholeIcon className='h-4 w-4' /></TooltipTrigger>
+                          <TooltipContent>
+                            <p>Private Snippet</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger><LockKeyholeOpen className='h-4 w-4' /></TooltipTrigger>
+                          <TooltipContent>
+                            <p>Public Snippet</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )
+                  )}
+                  {snippet.updatedAt && new Date(snippet.updatedAt) > new Date(snippet.createdAt) ? (
+                    <h1 className='flex text-neutral-400'>Updated at: {formatDate(snippet.updatedAt)}</h1>
+                  ) : (
+                    <h1 className='flex text-neutral-400'>Created at: {formatDate(snippet.createdAt)}</h1>
+                  )}
+                </div>
+              </div>
+              <p className="text-lg mt-1">{snippet.title}</p>
+              <p className="text-sm mt-1">
                 {snippet.description
                   ? truncateDescription(snippet.description, 30)
                   : ""}
@@ -222,7 +261,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
             </div>
           </div>
           <Separator className="bg-slate-400/20" />
-          <div className='w-full flex justify-center px-4 py-4'>
+          <div className='w-full flex flex-row justify-center px-4 py-3'>
             <div className='w-full flex flex-row bg-[#1a1a1a] items-center rounded-md overflow-hidden'>
               <div className='flex-grow flex items-center px-3 py-2'>
                 <Link className='h-4 w-4 mr-2 text-white' />

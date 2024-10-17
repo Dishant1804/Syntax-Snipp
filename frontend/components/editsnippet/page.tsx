@@ -12,11 +12,12 @@ import axios from 'axios';
 import MonacoEditorEditSnippetComponent from '../monacoEditorEditSnippet/page';
 
 const EditSnippetComponent = () => {
-  const [snippet, setSnippet] = useState<{ title?: string; description?: string; tags?: string[]; content?: string }>({});
+  const [snippet, setSnippet] = useState<{ title?: string; description?: string; tags?: string[]; content?: string; isPrivate?: boolean }>({});
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [content, setContent] = useState<string>('');
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [newTag, setNewTag] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [id, setId] = useState<string>('');
@@ -54,6 +55,7 @@ const EditSnippetComponent = () => {
         setDescription(response.data.snippet.description || '');
         setTags(response.data.snippet.tags || []);
         setContent(response.data.snippet.content || '');
+        setIsPrivate(response.data.snippet.isPrivate || false);
       }
     } catch (e) {
       console.log(e);
@@ -119,13 +121,15 @@ const EditSnippetComponent = () => {
                 </div>
                 <div className='flex flex-col mt-4'>
                   <Label className='text-xl flex items-start'>Snippet</Label>
-                  <MonacoEditorEditSnippetComponent 
-                    title={title} 
-                    description={description} 
-                    tags={tags} 
+                  <MonacoEditorEditSnippetComponent
+                    title={title}
+                    description={description}
+                    tags={tags}
                     content={content}
                     setContent={setContent}
                     id={id}
+                    isPrivate={isPrivate}
+                    setIsPrivate={setIsPrivate}
                   />
                 </div>
               </div>

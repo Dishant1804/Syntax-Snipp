@@ -3,8 +3,11 @@ import { customTheme } from '@/helpers/helper';
 import { useEffect, useRef, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from '../ui/button';
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { LockKeyholeIcon } from 'lucide-react';
 
 type SnippetContents = {
   title: string,
@@ -14,6 +17,7 @@ type SnippetContents = {
 
 export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }: SnippetContents) => {
   const monacoRef = useRef<Monaco | null>(null);
+  const [isPrivate , setIsPrivate] = useState<boolean>(false);
   const editorRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: '100%' });
@@ -56,7 +60,8 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
       description,
       tags,
       content,
-      language: selectedLanguage
+      language: selectedLanguage,
+      isPrivate
     }
 
     try {
@@ -86,7 +91,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
           </div>
         </div>
         <div className='flex flex-row w-full justify-between px-8 items-center mb-4'>
-          <div className='flex flex-row'>
+          <div className='flex flex-row items-center'>
             <h2>Select the language : &nbsp; </h2>
             <Select onValueChange={setSelectedLanguage} defaultValue={selectedLanguage}>
               <SelectTrigger className="w-[180px] border-white/20 outline-none">
@@ -101,7 +106,18 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleSubmitSnippet} className="bg-neutral-700 hover:bg-neutral-800 font-bold">Create snippet</Button>
+          <div className='gap-4 flex flex-row items-center'>
+            <div className="flex items-center space-x-2">
+              <Switch
+                className='data-[state=checked]:bg-neutral-500 data-[state=unchecked]:bg-neutral-700'
+                id="private-mode"
+                checked={isPrivate}
+                onCheckedChange={() => setIsPrivate(!isPrivate)}
+              />
+              <Label htmlFor="private-mode" className='flex flex-row gap-2 items-center'><LockKeyholeIcon className='h-4 w-4' /> Private</Label>
+            </div>
+            <Button onClick={handleSubmitSnippet} className="bg-neutral-700 hover:bg-neutral-800 font-bold">Create snippet</Button>
+          </div>
         </div>
         <div ref={containerRef} className='flex-shrink overflow-hidden w-full'>
           <Editor

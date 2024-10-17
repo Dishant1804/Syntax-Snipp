@@ -1,7 +1,7 @@
 import { editor } from 'monaco-editor';
 
 
-export const truncateDescription = (description: string , length : number): string => {
+export const truncateDescription = (description: string, length: number): string => {
   const words = description.split(' ');
   if (words.length > length) {
     return words.slice(0, length).join(' ') + '...';
@@ -16,6 +16,15 @@ export const truncateTitle = (title: string): string => {
     return words.slice(0, 18).join(' ') + '...';
   }
   return title;
+};
+
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year} UTC+05:30`;
 };
 
 export const customTheme: editor.IStandaloneThemeData = {

@@ -81,7 +81,7 @@ const CreateSnippetComponent = () => {
                   <Input 
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     placeholder="Add tag"
                     className="pl-8 flex items-center text-white/90 border-slate-400/20 h-10 text-md"
                   />
@@ -92,7 +92,7 @@ const CreateSnippetComponent = () => {
               </div>
               <div className='flex flex-col mt-4'>
                 <Label className='text-xl flex items-start'>Snippet</Label>
-                <MonacoEditorCreateSnippetComponent title={title} description={description} tags={tags} />
+                <MonacoEditorCreateSnippetComponent title={title} description={description} tags={tags}/>
               </div>
             </div>
           </div>

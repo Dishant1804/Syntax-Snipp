@@ -102,7 +102,7 @@ export const Sidebar = () => {
 
   const handleAvailNowClick = () => {
     setIsDialogOpen(false);
-    createRazorpayOrder(999);
+    createRazorpayOrder(335);
   };
   
   const handleLogoutClick = () => {
@@ -193,6 +193,10 @@ export const Sidebar = () => {
               Unlock the full potential of Syntax Snipp with our Pro plan!
             </DialogDescription>
           </DialogHeader>
+          <div className='flex flex-row items-center'>
+            <h1 className='text-xl font-bold'>$3.99</h1>
+            <h3 className='text-sm'>/month</h3>
+          </div>
           <div className="py-4">
             <h3 className="font-semibold mb-2">Pro Features:</h3>
             <ul className="space-y-1">

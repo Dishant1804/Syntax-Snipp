@@ -5,6 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from '../ui/button';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
+import { LockKeyholeIcon } from 'lucide-react';
 
 type SnippetContents = {
   title: string;
@@ -13,9 +16,11 @@ type SnippetContents = {
   content: string;
   setContent: React.Dispatch<React.SetStateAction<string>>;
   id: string;
+  isPrivate: boolean;
+  setIsPrivate: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, content, setContent }: SnippetContents) => {
+const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, content, setContent, isPrivate , setIsPrivate }: SnippetContents) => {
   const monacoRef = useRef<Monaco | null>(null);
   const editorRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,8 +55,8 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
   }, []);
 
   const languages = [
-    'javascript', 'python', 'java', 'c', 'c++', 'html', 'css', 'typescript', 'sql', 
-    'php', 'ruby', 'go', 'swift', 'kotlin', 'flutter', 'xml', 'json', 
+    'javascript', 'python', 'java', 'c', 'c++', 'html', 'css', 'typescript', 'sql',
+    'php', 'ruby', 'go', 'swift', 'kotlin', 'flutter', 'xml', 'json',
     'markdown', 'shell', 'r', 'vue', 'yaml', 'csharp'
   ];
 
@@ -62,7 +67,8 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
       description,
       tags,
       content: updatedContent,
-      language: selectedLanguage
+      language: selectedLanguage,
+      isPrivate,
     };
 
     try {
@@ -70,7 +76,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
         withCredentials: true
       });
       console.log('Snippet updated:', response.data);
-      
+
       if (response.data.success) {
         router.push('/dashboard');
       }
@@ -88,7 +94,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
           <div className='bg-green-500 h-3 w-3 rounded-full'></div>
         </div>
         <div className='flex items-center font-mono justify-center w-full text-white/90'>
-          ~/Syntax-snipp/{id ? 'editSnippet' : 'createSnippet'}
+          ~/Syntax-snippet/editSnippet
         </div>
       </div>
       <div className='flex flex-row w-full justify-between px-8 items-center mb-4'>
@@ -107,9 +113,22 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleSubmitSnippet} className="bg-neutral-700 hover:bg-neutral-800 font-bold">
-          {id ? 'Update snippet' : 'Create snippet'}
-        </Button>
+        <div className='gap-4 flex flex-row items-center'>
+          <div className="flex items-center space-x-2">
+            <Switch
+              className='data-[state=checked]:bg-neutral-500 data-[state=unchecked]:bg-neutral-700'
+              id="private-mode"
+              checked={isPrivate}
+              onCheckedChange={() => setIsPrivate(!isPrivate)}
+            />
+            <Label htmlFor="private-mode" className='flex flex-row gap-2 items-center'>
+              <LockKeyholeIcon className='h-4 w-4' /> Private
+            </Label>
+          </div>
+          <Button onClick={handleSubmitSnippet} className="bg-neutral-700 hover:bg-neutral-800 font-bold">
+            Update snippet
+          </Button>
+        </div>
       </div>
       <div ref={containerRef} className='flex-shrink overflow-hidden w-full'>
         <Editor
@@ -130,7 +149,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
           className="flex"
         />
       </div>
-    </div>
+    </div >
   );
 };
 

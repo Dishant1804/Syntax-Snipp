@@ -20,6 +20,9 @@ type Snippet = {
     username: string;
   };
   tags: string[];
+  createdAt : string;
+  updatedAt : string;
+  isPrivate: boolean;
 };
 
 export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetDeleted: boolean, setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, setActiveTab: React.Dispatch<SetStateAction<"allsnippets" | "mysnippets">>; }) => {
@@ -48,7 +51,13 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
       const response = await axios.get(endpoint, {
         withCredentials: true,
       });
-      const fetchedSnippets = response.data.allSnippets || response.data.snippets || [];
+
+      let fetchedSnippets = response.data.allSnippets || response.data.snippets || [];
+      
+      if (activeTabInternal === "allsnippets") {
+        fetchedSnippets = fetchedSnippets.filter((snippet: Snippet) => !snippet.isPrivate);
+      }
+
       setSnippets(fetchedSnippets);
 
       if (fetchedSnippets.length > 0) {
