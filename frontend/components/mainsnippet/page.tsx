@@ -22,7 +22,7 @@ interface UserProfile {
   email: string;
 }
 
-export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" }) => {
+export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const snippet = useSelector((state: RootState) => state.snippet.selectedSnippet);
   const [isFavorite, setIsFavorite] = useState<boolean>(snippet?.favorite || false);
@@ -64,15 +64,6 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
     }
     setIsOpen(false);
   };
-
-  useEffect(() => {
-    if (snippet) {
-      console.log('Created At:', snippet.createdAt);
-      console.log('Updated At:', snippet.updatedAt);
-      console.log('Created At Type:', typeof snippet.createdAt);
-      console.log('Updated At Type:', typeof snippet.updatedAt);
-    }
-  }, [snippet, activeTab]);
 
 
   useEffect(() => {

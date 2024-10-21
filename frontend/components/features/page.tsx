@@ -28,7 +28,7 @@ const Features = () => {
             </li>
           </ul>
         </div>
-        <Image src={testimage} height={500} width={500} alt="" style={{objectFit : "fill"}} />
+        <Image src={testimage} height={500} width={500} alt="" style={{objectFit : "fill" , borderRadius : '10px'}} />
       </div>
       <div className="flex flex-col gap-4 lg:flex-row w-full justify-between items-center md:px-8 mt-8">
         <div className="relative hidden md:flex h-[420px] w-[420px] flex-col items-center justify-center overflow-hidden bg-transparent">

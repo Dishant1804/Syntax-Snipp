@@ -54,7 +54,7 @@ export const Sidebar = () => {
       maxBodyLength: Infinity,
       url: "http://localhost:3000/api/v1/payments/orders",
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       data: data
     };
@@ -93,7 +93,7 @@ export const Sidebar = () => {
     };
 
     const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
+    paymentObject.open()  ;
   };
 
   const handleUpgradeClick = () => {

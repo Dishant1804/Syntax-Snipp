@@ -26,7 +26,7 @@ const BrowserMockupComponent = () => {
             src={siteImage}
             alt="Site preview"
             layout="cover"
-            style={{objectFit : "cover"}}
+            style={{objectFit : "cover" , borderRadius : '10px'}}
           />
         </div>
       </div>
