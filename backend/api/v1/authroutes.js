@@ -25,7 +25,7 @@ const userSigninSchema = z.object({
   password: z.string().min(8).max(50),
 });
 
-const signInLimiter = rateLimit({
+const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10000,
   message: "Too many attempts. Please try again later.",
@@ -35,7 +35,22 @@ const createToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET);
 };
 
-router.post("/signup", signInLimiter, async (req, res) => {
+router.get("/check-auth", (req, res) => {
+  const token = req.cookies.token;
+  
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    return res.json({ success: true });
+  } catch (error) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+});
+
+router.post("/signup", rateLimiter, async (req, res) => {
   const body = req.body;
 
   const validation = userSignupSchema.safeParse(body);
@@ -84,7 +99,7 @@ router.post("/signup", signInLimiter, async (req, res) => {
   }
 });
 
-router.post("/signin", signInLimiter, async (req, res) => {
+router.post("/signin", rateLimiter, async (req, res) => {
   const body = req.body;
   const validation = userSigninSchema.safeParse(body);
 
@@ -267,7 +282,7 @@ router.get('/github/callback', passport.authenticate('github', {
 );
 
 
-router.patch('/updateprofile', signInLimiter, authMiddleware, signInLimiter, async (req, res) => {
+router.patch('/updateprofile', rateLimiter, authMiddleware, async (req, res) => {
   const { username, email, password } = req.body;
   const userId = req.user.userId;
 
@@ -354,6 +369,7 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
         isGithub: true,
         createdAt: true,
         updatedAt: true,
+        isSubscribed : true,
       },
     });
 
@@ -373,8 +389,8 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  res.cookie("token", "" , {
-    httpOnly: true, 
+  res.clearCookie("token", {
+    httpOnly: true,
     sameSite: "Lax",
   });
   res.json({ message: "Logged out successfully", success: true });
