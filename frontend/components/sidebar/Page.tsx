@@ -83,9 +83,19 @@ export const Sidebar = () => {
       currency: 'INR',
       name: "Syntax Snipp",
       description: "Upgrade to Pro",
-      handler: function (response: any) {
+      handler: async function (response: any) {
         setResponseId(response.razorpay_payment_id);
-        alert("Payment successful! Your payment ID is: " + response.razorpay_payment_id);
+        const data = {
+          paymentId : response.razorpay_payment_id,
+          amount : amount,
+        }
+        const activateSubscription = await axios.post('http://localhost:3000/api/v1/payments/activate-subscription' , data , {
+          withCredentials : true,
+        });
+        if(!activateSubscription.data.success){
+          alert("Payment was not successful! Your payment ID is: " + response.razorpay_payment_id + "contact the admin for more details");
+        }
+        alert("Payment successfull");
       },
       theme: {
         color: "#272729"

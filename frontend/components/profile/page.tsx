@@ -146,7 +146,7 @@ const ProfileComponent = ({ option }: { option: string }) => {
         </>
       ) : (
         <>
-          <div className="w-full text-white/90 flex flex-col hidden">
+          <div className="w-full text-white/90 flex-col hidden">
             <div className="flex flex-col gap-2 mt-8">
               <h1 className="font-medium text-2xl">Theme</h1>
               <h3 className="text-md text-[#85868b]">Customize the appearance of the app. Automatically switch between day and night themes.</h3>

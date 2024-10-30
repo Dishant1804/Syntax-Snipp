@@ -20,10 +20,11 @@ type SnippetContents = {
   setIsPrivate: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, content, setContent, isPrivate , setIsPrivate }: SnippetContents) => {
+const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, content, setContent, isPrivate, setIsPrivate }: SnippetContents) => {
   const monacoRef = useRef<Monaco | null>(null);
   const editorRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [dimensions, setDimensions] = useState({ width: '100%' });
   const [selectedLanguage, setSelectedLanguage] = useState('javascript');
   const router = useRouter();
@@ -47,6 +48,18 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
         });
       }
     };
+
+    const fetchProfile = async() => {
+      const profileResponse = await axios.get('http://localhost:3000/api/v1/auth/user/profile', {
+        withCredentials: true,
+      });
+
+      if (profileResponse.data.success) {
+        setIsSubscribed(profileResponse.data.profile.isSubscribed);
+      }
+    }
+
+    fetchProfile();
 
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
@@ -116,13 +129,20 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
         <div className='gap-4 flex flex-row items-center'>
           <div className="flex items-center space-x-2">
             <Switch
-              className='data-[state=checked]:bg-neutral-500 data-[state=unchecked]:bg-neutral-700'
+              className="data-[state=checked]:bg-neutral-500 data-[state=unchecked]:bg-neutral-700"
               id="private-mode"
               checked={isPrivate}
               onCheckedChange={() => setIsPrivate(!isPrivate)}
+              disabled={!isSubscribed}
             />
-            <Label htmlFor="private-mode" className='flex flex-row gap-2 items-center'>
-              <LockKeyholeIcon className='h-4 w-4' /> Private
+            <Label htmlFor="private-mode" className="flex flex-row gap-2 items-center">
+              <LockKeyholeIcon className="h-4 w-4" />
+              <span>Private</span>
+              {!isSubscribed && (
+                <span className="ml-2 text-sm text-neutral-400 tooltip" data-tip="Premium feature">
+                  (Premium)
+                </span>
+              )}
             </Label>
           </div>
           <Button onClick={handleSubmitSnippet} className="bg-neutral-700 hover:bg-neutral-800 font-bold">
