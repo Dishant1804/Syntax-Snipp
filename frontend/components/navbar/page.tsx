@@ -9,10 +9,11 @@ const NavbarComponent = ({isShareSnippet} : {isShareSnippet :boolean}) => {
         <Code2Icon className="flex h-5 w-5 md:h-6 md:w-6" />
         <Link href='/' className="text-xl md:text-2xl cursor-pointer">Syntax-snipp</Link>
       </div>
-      <ul className="gap-6 hidden md:flex items-center font-semibold">
+      <ul className="gap-4 lg:gap-6 hidden md:flex items-center font-semibold">
         {!isShareSnippet && <>
-          <li className="hover:underline cursor-pointer">Features</li>
-        <li className="hover:underline cursor-pointer">Pricing</li>
+          <Link href={''} className="hover:underline cursor-pointer">Features</Link >
+          <Link href={''} className="hidden lg:flex hover:underline cursor-pointer">Pricing</Link >
+          <Link href={'/docs'} className="hover:underline cursor-pointer">Docs</Link >
         </>}
         <Link href='/signin' className="border border-slate-400/50 px-4 py-2 rounded-xl">Log In</Link>
         <Link href='/signup' className="bg-white/90 text-[#111111] px-4 py-2 rounded-xl">Sign Up</Link>

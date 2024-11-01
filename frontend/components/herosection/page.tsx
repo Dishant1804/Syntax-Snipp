@@ -26,7 +26,7 @@ const HeroSectionComponent = () => {
             </div>
           </div>
           <div className='flex md:text-xl pt-4 md:pt-8 text-neutral-300 max-w-2xl md:max-w-4xl'>
-            Syntax-snipp is your ultimate companion for creating, managing, and showcasing your code snippets. Say goodbye to repetitive coding, Access your snippets in IDEs, share them across your organizations.
+            Syntax-snipp is an ultimate tool for creating, managing, and showcasing your code snippets. Say goodbye to repetitive coding, Access your snippets in IDEs, share them across your organizations.
           </div>
           <div className='flex md:flex-row pt-4 md:pt-8 gap-4'>
             <Link href={'/signup'} className='hidden md:flex px-4 items-center py-2 rounded-lg bg-neutral-300 text-[#111111] font-bold text-md font-mono hover:bg-neutral-200'>Get started for free</Link>

@@ -13,7 +13,8 @@ import { Button } from '../ui/button';
 import axios from 'axios';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
+import { usePathname } from 'next/navigation';
 
 
 const languages = [
@@ -30,6 +31,7 @@ declare global {
 
 
 export const Sidebar = () => {
+  const pathname = usePathname();
   const { toast } = useToast()
   const [responseId, setResponseId] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -101,7 +103,7 @@ export const Sidebar = () => {
               title: "Payment Error",
               description: "Your payment was processed, but subscription activation failed. Please contact support.",
               variant: "destructive",
-              duration : 3000
+              duration: 3000
             });
           }
           else {
@@ -109,7 +111,7 @@ export const Sidebar = () => {
               title: "Subscription Activated!",
               description: "Welcome to Syntax Snipp Pro! Enjoy Pro features.",
               variant: "default",
-              duration : 3000
+              duration: 3000
             });
           }
         } catch (error) {
@@ -118,7 +120,7 @@ export const Sidebar = () => {
             title: "Activation Error",
             description: "There was an issue activating your subscription. Please try again or contact support.",
             variant: "destructive",
-            duration : 3000
+            duration: 3000
           });
         }
       },
@@ -148,7 +150,7 @@ export const Sidebar = () => {
     setIsLogoutDialogOpen(false);
     toast({
       title: "Logged out!",
-      duration : 3000
+      duration: 3000
     })
     router.push('/logout');
   };
@@ -170,12 +172,21 @@ export const Sidebar = () => {
             { icon: LogOut, text: "Logout", onClick: handleLogoutClick },
           ].map(({ icon: Icon, text, redirectUri, onClick }) => (
             onClick ? (
-              <div key={text} onClick={onClick} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
+              <div
+                key={text}
+                onClick={onClick}
+                className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer"
+              >
                 <Icon className="h-5 w-5" />
                 <h1>{text}</h1>
               </div>
             ) : (
-              <Link href={`http://localhost:3001${redirectUri}`} key={text} className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer">
+              <Link
+                href={`http://localhost:3001${redirectUri}`}
+                key={text}
+                className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === redirectUri ? 'bg-[#272729] text-white' : 'text-white/90'
+                  }`}
+              >
                 <Icon className="h-5 w-5" />
                 <h1>{text}</h1>
               </Link>
