@@ -31,13 +31,9 @@ const rateLimiter = rateLimit({
   message: "Too many attempts. Please try again later.",
 });
 
-const createToken = (userId) => {
-  return jwt.sign({ userId }, JWT_SECRET);
-};
-
 router.get("/check-auth", (req, res) => {
   const token = req.cookies.token;
-  
+
   if (!token) {
     return res.status(401).json({ success: false, message: 'Unauthorized' });
   }
@@ -85,7 +81,7 @@ router.post("/signup", rateLimiter, async (req, res) => {
       },
     });
 
-    const token = createToken(user.id);
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -134,7 +130,7 @@ router.post("/signin", rateLimiter, async (req, res) => {
         .json({ message: "Invalid Credentials", success: false });
     }
 
-    const token = createToken(user.id);
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -369,7 +365,7 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
         isGithub: true,
         createdAt: true,
         updatedAt: true,
-        isSubscribed : true,
+        isSubscribed: true,
       },
     });
 
