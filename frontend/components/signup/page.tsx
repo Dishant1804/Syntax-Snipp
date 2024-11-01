@@ -35,7 +35,9 @@ export default function SignupComponent() {
     const data = { username, email, password };
 
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/auth/signup", data);
+      const response = await axios.post("http://localhost:3000/api/v1/auth/signup", data, {
+        withCredentials : true,
+      });
 
       if (response.data.status !== "signedup" && response.data.success !== true) {
         toast({
@@ -102,7 +104,7 @@ export default function SignupComponent() {
                 Reset password
               </div>
               <div className="w-full flex items-center justify-between">
-                <Button className="px-4 py-2 w-full bg-white/90 text-black hover:bg-neutral-300" onChange={handleSubmitButton}>Sign Up</Button>
+                <Button className="px-4 py-2 w-full bg-white/90 text-black hover:bg-neutral-300" onClick={handleSubmitButton}>Sign Up</Button>
               </div>
               <div className="text-sm">
                 Already have an account? <Link href={'/signin'} prefetch={false} className="underline">Sign In</Link>
@@ -124,7 +126,7 @@ export default function SignupComponent() {
             <span className="font-semibold flex items-center gap-3"><CodeXml className="h-4 w-4 md:h-10 md:w-10" /> Syntax Snipp.</span>
           </div>
           <div className="text-xl font-light max-w-2xl text-center">
-            Dive into the Realm of Code Snippets<br/> Start Showcasing and Managing Your Code Masterpieces!
+            Dive into the Realm of Code Snippets<br /> Start Showcasing and Managing Your Code Masterpieces!
           </div>
         </div>
       </div>

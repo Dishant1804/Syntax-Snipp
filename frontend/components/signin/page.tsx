@@ -33,7 +33,9 @@ export default function SigninComponent() {
     const data = { email, password };
 
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/auth/signin", data);
+      const response = await axios.post("http://localhost:3000/api/v1/auth/signin", data , {
+        withCredentials : true,
+      });
 
       if (response.data.status !== "signedup" && response.data.success !== true) {
         toast({
@@ -41,9 +43,6 @@ export default function SigninComponent() {
           description: "Something went wrong try again after sometime",
         })
       }
-
-      console.log(response.data);
-      localStorage.setItem("token", response.data.token);
       router.push('/dashboard')
 
       setEmail("");
@@ -104,7 +103,7 @@ export default function SigninComponent() {
                 Reset password
               </div>
               <div className="w-full flex items-center justify-between">
-                <Button className="px-4 py-2 w-full bg-white/90 text-black hover:bg-neutral-300" onChange={handleSubmitButton}>Sign In</Button>
+                <Button className="px-4 py-2 w-full bg-white/90 text-black hover:bg-neutral-300" onClick={handleSubmitButton}>Sign In</Button>
               </div>
               <div className="text-sm">
                 Don't have an account? <Link href={'/signup'} prefetch={false} className="underline">Sign Up</Link>
