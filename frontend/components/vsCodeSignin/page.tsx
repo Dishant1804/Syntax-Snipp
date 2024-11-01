@@ -44,6 +44,7 @@ const VsCodeSigninComponent = () => {
         toast({
           title: "Error while signing up",
           description: "Something went wrong try again after sometime",
+          duration : 5000,
         });
       }
 
@@ -58,6 +59,7 @@ const VsCodeSigninComponent = () => {
       toast({
         title: "Error while signing up",
         description: "Something went wrong try again after sometime",
+        duration : 5000,
       });
     }
   };

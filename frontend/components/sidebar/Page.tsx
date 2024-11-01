@@ -13,6 +13,8 @@ import { Button } from '../ui/button';
 import axios from 'axios';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
+import { useToast } from "@/hooks/use-toast"
+
 
 const languages = [
   "JavaScript", "TypeScript", "Java", "Python", "C", "C++",
@@ -28,6 +30,7 @@ declare global {
 
 
 export const Sidebar = () => {
+  const { toast } = useToast()
   const [responseId, setResponseId] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
@@ -86,16 +89,38 @@ export const Sidebar = () => {
       handler: async function (response: any) {
         setResponseId(response.razorpay_payment_id);
         const data = {
-          paymentId : response.razorpay_payment_id,
-          amount : amount,
+          paymentId: response.razorpay_payment_id,
+          amount: amount,
         }
-        const activateSubscription = await axios.post('http://localhost:3000/api/v1/payments/activate-subscription' , data , {
-          withCredentials : true,
-        });
-        if(!activateSubscription.data.success){
-          alert("Payment was not successful! Your payment ID is: " + response.razorpay_payment_id + "contact the admin for more details");
+        try {
+          const activateSubscription = await axios.post('http://localhost:3000/api/v1/payments/activate-subscription', data, {
+            withCredentials: true,
+          });
+          if (!activateSubscription.data.success) {
+            toast({
+              title: "Payment Error",
+              description: "Your payment was processed, but subscription activation failed. Please contact support.",
+              variant: "destructive",
+              duration : 3000
+            });
+          }
+          else {
+            toast({
+              title: "Subscription Activated!",
+              description: "Welcome to Syntax Snipp Pro! Enjoy Pro features.",
+              variant: "default",
+              duration : 3000
+            });
+          }
+        } catch (error) {
+          console.error("Subscription activation error:", error);
+          toast({
+            title: "Activation Error",
+            description: "There was an issue activating your subscription. Please try again or contact support.",
+            variant: "destructive",
+            duration : 3000
+          });
         }
-        alert("Payment successfull");
       },
       theme: {
         color: "#272729"
@@ -103,7 +128,7 @@ export const Sidebar = () => {
     };
 
     const paymentObject = new window.Razorpay(options);
-    paymentObject.open()  ;
+    paymentObject.open();
   };
 
   const handleUpgradeClick = () => {
@@ -114,13 +139,17 @@ export const Sidebar = () => {
     setIsDialogOpen(false);
     createRazorpayOrder(335);
   };
-  
+
   const handleLogoutClick = () => {
     setIsLogoutDialogOpen(true);
   };
-  
+
   const handleLogoutConfirm = () => {
     setIsLogoutDialogOpen(false);
+    toast({
+      title: "Logged out!",
+      duration : 3000
+    })
     router.push('/logout');
   };
 

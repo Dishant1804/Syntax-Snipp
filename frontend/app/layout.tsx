@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from '../app/store/store';
 import AuthCheck from '@/helpers/AuthCheck';
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 const spaceMono = Space_Mono({
   subsets: ['latin'],
@@ -26,6 +27,7 @@ export default function RootLayout({
         <Provider store={store}>
           <AuthCheck>
             {children}
+            <Toaster />
           </AuthCheck>
         </Provider>
       </body>
