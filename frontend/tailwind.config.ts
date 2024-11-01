@@ -47,6 +47,11 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
         },
+        "color-1": "hsl(var(--color-1))",
+        "color-2": "hsl(var(--color-2))",
+        "color-3": "hsl(var(--color-3))",
+        "color-4": "hsl(var(--color-4))",
+        "color-5": "hsl(var(--color-5))",
       },
       borderRadius: {
         xl: `calc(var(--radius) + 4px)`,
@@ -62,6 +67,10 @@ export default {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 }
+        },
+        "rainbow" : {
+          "0%": { "background-position": "0%" },
+          "100%": { "background-position": "200%" },
         },
         "spotlight": {
           "0%": {
@@ -89,6 +98,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "spotlight": "spotlight 2s ease .75s 1 forwards",
         "orbit": "orbit calc(var(--duration)*1s) linear infinite",
+        "rainbow": "rainbow var(--speed, 2s) infinite linear"
       },
     },
   },
