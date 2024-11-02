@@ -213,9 +213,19 @@ router.get('/google/vscode/callback', passport.authenticate('google-vscode', {
         },
       });
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+      const subscription = await prisma.user.findUnique({
+        where : {
+          email : profile.emails[0].value,
+        },
+        select : {
+          isSubscribed : true,
+        }
+      })
 
-      res.redirect(`http://localhost:54321/auth/${token}`);
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+      
+
+      res.redirect(`http://localhost:54321/auth/${token}/${subscription.isSubscribed}`);
     } catch (e) {
       console.log(e);
       res.status(500).json({ error: "Internal server error" });
