@@ -6,6 +6,8 @@ import rateLimit from "express-rate-limit";
 import authMiddleware from "./middleware/authMiddleware.js";
 import { z } from "zod";
 import passport from "./config/passportConfig.js";
+import { createSession } from "../../helper/tokenGenerator.js";
+
 
 const router = express.Router();
 
@@ -31,18 +33,27 @@ const rateLimiter = rateLimit({
   message: "Too many attempts. Please try again later.",
 });
 
-router.get("/check-auth", (req, res) => {
+router.get("/check-session", async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Unauthorized' });
+    return res.json({ success: false, message: 'Unauthorized' , valid : false });
   }
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET);
-    return res.json({ success: true });
+    const session = await prisma.session.findUnique({
+      where: { token: req.cookies.token, isValid: true },
+    });
+
+    if (session) {
+      return res.json({ valid: true, success: true });
+    }
+    else {
+      return res.json({ valid: false, success: true });
+    }
   } catch (error) {
-    return res.status(401).json({ success: false, message: 'Unauthorized' });
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", success: false });
   }
 });
 
@@ -81,7 +92,7 @@ router.post("/signup", rateLimiter, async (req, res) => {
       },
     });
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    const token = await createSession(user.id);
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -130,7 +141,18 @@ router.post("/signin", rateLimiter, async (req, res) => {
         .json({ message: "Invalid Credentials", success: false });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    const existingSessions = await prisma.session.findMany({
+      where: { userId: user.id, isValid: true },
+    });
+
+    if (existingSessions.length > 0) {
+      await prisma.session.updateMany({
+        where: { userId: user.id },
+        data: { isValid: false },
+      });
+    }
+
+    const token = await createSession(user.id);
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -178,7 +200,18 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
         },
       });
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+      const existingSessions = await prisma.session.findMany({
+        where: { userId: user.id, isValid: true },
+      });
+  
+      if (existingSessions.length > 0) {
+        await prisma.session.updateMany({
+          where: { userId: user.id },
+          data: { isValid: false },
+        });
+      }
+  
+      const token = await createSession(user.id);
       res.cookie("token", token, {
         httpOnly: true,
         sameSite: "lax",
@@ -268,11 +301,23 @@ router.get('/github/callback', passport.authenticate('github', {
         });
       }
 
-      const newToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
+      const existingSessions = await prisma.session.findMany({
+        where: { userId: user.id, isValid: true },
+      });
+      if (existingSessions.length > 0) {
+        await prisma.session.updateMany({
+          where: { userId: user.id },
+          data: { isValid: false },
+        });
+      }
+
+      const newToken = await createSession(user.id);
+
       res.cookie("token", newToken, {
         httpOnly: true,
         sameSite: "lax",
       });
+
       res.cookie("githubToken", token, {
         httpOnly: true,
         sameSite: "lax",
@@ -280,9 +325,7 @@ router.get('/github/callback', passport.authenticate('github', {
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (error) {
       console.error("Error linking GitHub account:", error);
-      res
-        .status(500)
-        .json({ error: "Failed to link GitHub account", success: false });
+      res.status(500).json({ error: "Failed to link GitHub account", success: false });
     }
   },
 );
@@ -394,12 +437,21 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
   }
 });
 
-router.post("/logout", (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    sameSite: "Lax",
-  });
-  res.json({ message: "Logged out successfully", success: true });
+router.post("/logout", authMiddleware, async (req, res) => {
+  try {
+    await prisma.session.update({
+      where: { token: req.cookies.token },
+      data: { isValid: false },
+    });
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "Lax",
+    });
+    res.json({ message: "Logged out successfully", success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error", success: false });
+  }
 });
 
 
