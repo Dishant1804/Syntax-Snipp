@@ -3,15 +3,17 @@
 import { useLayoutEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 import { SpinnerWithText } from '../components/ui/spinnerWithText';
 
 
-const publicRoutes = ['/', '/login', '/signup', '/signin', '/sharesnippet'];
+const publicRoutes = ['/', '/login', '/signup', '/signin', '/sharesnippet' , '/docs'];
 
 const AuthCheck = ({ children }: any) => {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useLayoutEffect(() => {
     const checkAuth = async () => {
@@ -21,15 +23,25 @@ const AuthCheck = ({ children }: any) => {
       }
 
       try {
-        const response = await axios.get('http://localhost:3000/api/v1/auth/check-auth', {
+        const response = await axios.get('http://localhost:3000/api/v1/auth/check-session', {
           withCredentials: true,
         });
 
-        if (!response.data.success) {
+        if (!response.data.valid) {
+          toast({
+            title: "Session Expired",
+            description: "Please login again!",
+            duration : 5000,
+          });
           router.push('/');
         }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
+      } 
+      catch (error) {
+        toast({
+          title: "Something went wrong",
+          description: "Please login again!",
+          duration : 5000
+        });
         router.push('/');
       } finally {
         setLoading(false);

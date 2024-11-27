@@ -58,7 +58,6 @@ export default function SigninComponent() {
           title: "Sign in failed",
           description: response.data.message || "Invalid credentials",
           duration : 5000,
-          action: <ToastAction altText="Try again">Try again</ToastAction>
         });
       }
 
@@ -71,7 +70,6 @@ export default function SigninComponent() {
         title: "Error",
         description: "Something went wrong. Please try again.",
         duration : 5000,
-        action: <ToastAction altText="Try again">Try again</ToastAction>
       });
     }
   };
