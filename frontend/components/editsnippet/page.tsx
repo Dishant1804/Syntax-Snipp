@@ -49,7 +49,6 @@ const EditSnippetComponent = () => {
       });
 
       if (response.data.success) {
-        console.log(response.data.snippet);
         setSnippet(response.data.snippet);
         setTitle(response.data.snippet.title || '');
         setDescription(response.data.snippet.description || '');

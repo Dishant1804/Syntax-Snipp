@@ -88,7 +88,6 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
       const response = await axios.patch(`http://localhost:3000/api/v1/snippet/updatesnippet/${id}`, data, {
         withCredentials: true
       });
-      console.log('Snippet updated:', response.data);
 
       if (response.data.success) {
         router.push('/dashboard');
