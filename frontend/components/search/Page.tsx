@@ -68,7 +68,8 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
       console.error(e);
       setError("Failed to fetch snippets");
       setSnippets([]);
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   };

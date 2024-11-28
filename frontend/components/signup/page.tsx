@@ -12,13 +12,15 @@ import { ChromeIcon, CodeXml, KeyRoundIcon, Mail, User } from 'lucide-react'
 import { Button } from "../ui/button"
 import { Separator } from "../ui/separator"
 import { ToastAction } from "../ui/toast"
+import { SpinnerWithText } from "../ui/spinnerWithText"
 
 export default function SignupComponent() {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [username, setUsername] = useState<string>("")
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
+  const router = useRouter();
+  const { toast } = useToast();
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("");
 
   const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value)
@@ -33,6 +35,7 @@ export default function SignupComponent() {
   }
 
   const handleSubmitButton = async (e: React.FormEvent) => {
+    setLoading(true)
     e.preventDefault()
 
     if (!username || !email || !password) {
@@ -40,9 +43,10 @@ export default function SignupComponent() {
         variant: "destructive",
         title: "Required fields missing",
         description: "Please fill in all fields",
-        duration : 5000,
+        duration: 5000,
         action: <ToastAction altText="Try again">Try again</ToastAction>
       })
+      setLoading(false);
       return
     }
 
@@ -52,9 +56,10 @@ export default function SignupComponent() {
         variant: "destructive",
         title: "Invalid email",
         description: "Please enter a valid email address",
-        duration : 5000,
+        duration: 5000,
         action: <ToastAction altText="Try again">Try again</ToastAction>
       })
+      setLoading(false);
       return
     }
 
@@ -63,9 +68,10 @@ export default function SignupComponent() {
         variant: "destructive",
         title: "Invalid password",
         description: "Password must be at least 6 characters long",
-        duration : 5000,
+        duration: 5000,
         action: <ToastAction altText="Try again">Try again</ToastAction>
       })
+      setLoading(false);
       return
     }
 
@@ -78,8 +84,8 @@ export default function SignupComponent() {
 
       if (response.data.success === true) {
         toast({
-          title : "Account created successfully",
-          duration : 3000,
+          title: "Account created successfully",
+          duration: 3000,
         })
         router.push('/signin')
 
@@ -91,32 +97,42 @@ export default function SignupComponent() {
           variant: "destructive",
           title: "Sign up failed",
           description: response.data.message || "Something went wrong",
-          duration : 5000,
+          duration: 5000,
           action: <ToastAction altText="Try again">Try again</ToastAction>
         })
       }
-    } catch (error: any) {
+    }
+    catch (error: any) {
       console.error("Error during signup:", error)
       toast({
         variant: "destructive",
         title: "Error while signing up",
-        duration : 5000,
+        duration: 5000,
         description: error.response?.data?.message || "Something went wrong. Please try again.",
         action: <ToastAction altText="Try again">Try again</ToastAction>
       })
     }
+    finally {
+      setLoading(false);
+    }
   }
 
   const handleGithubSignUp = () => {
+    setLoading(true)
     window.location.href = 'http://localhost:3000/api/v1/auth/github'
   }
 
   const handleGoogleSignUp = () => {
+    setLoading(true)
     window.location.href = "http://localhost:3000/api/v1/auth/google/dashboard"
   }
 
-  return (
-    <div className="w-full min-h-[calc(100vh-200px)] h-screen text-white/90 flex flex-row bg-[#111111] justify-center items-center">
+  return (<> {loading ? (
+    <div className="w-full bg-[#111111] h-full flex justify-center items-center">
+      <SpinnerWithText />
+    </div>
+  ) :
+    (<div className="w-full min-h-[calc(100vh-200px)] h-screen text-white/90 flex flex-row bg-[#111111] justify-center items-center">
       <div className="w-full lg:w-1/2 flex justify-center text-3xl sm:text-4xl font-semibold">
         <form onSubmit={handleSubmitButton} className="w-full flex flex-col justify-center items-center gap-4 max-w-md">
           <div className="lg:hidden flex items-center text-3xl sm:text-4xl">
@@ -135,39 +151,39 @@ export default function SignupComponent() {
                 <Label className="text-[16px] md:text-xl flex items-center gap-2">
                   <User className="md:h-5 md:w-5 h-4 w-4" />Username
                 </Label>
-                <Input 
-                  type="text" 
-                  placeholder="Username" 
-                  className="w-full max-w-lg border border-neutral-600" 
+                <Input
+                  type="text"
+                  placeholder="Username"
+                  className="w-full max-w-lg border border-neutral-600"
                   onChange={handleUsername}
                   value={username}
-                  required 
+                  required
                 />
               </div>
               <div>
                 <Label className="text-[16px] md:text-xl flex items-center gap-2">
                   <Mail className="md:h-5 md:w-5 h-4 w-4" />Email
                 </Label>
-                <Input 
-                  type="email" 
-                  placeholder="name@example.com" 
-                  className="w-full max-w-lg border border-neutral-600" 
+                <Input
+                  type="email"
+                  placeholder="name@example.com"
+                  className="w-full max-w-lg border border-neutral-600"
                   onChange={handleEmail}
                   value={email}
-                  required 
+                  required
                 />
               </div>
               <div>
                 <Label className="text-[16px] md:text-xl flex items-center gap-2">
                   <KeyRoundIcon className="md:h-5 md:w-5 h-4 w-4" />Password
                 </Label>
-                <Input 
-                  type="password" 
-                  placeholder="Enter your password" 
-                  className="w-full max-w-lg border border-neutral-600" 
+                <Input
+                  type="password"
+                  placeholder="Enter your password"
+                  className="w-full max-w-lg border border-neutral-600"
                   onChange={handlePassword}
                   value={password}
-                  required 
+                  required
                   minLength={6}
                 />
               </div>
@@ -188,16 +204,16 @@ export default function SignupComponent() {
             <div className="flex flex-col w-full gap-4">
               <div className="flex flex-col gap-4">
                 <Separator orientation="horizontal" className="bg-neutral-700" />
-                <Button 
+                <Button
                   type="button"
-                  className="w-full items-center gap-2 bg-white/90 text-black hover:bg-neutral-300" 
+                  className="w-full items-center gap-2 bg-white/90 text-black hover:bg-neutral-300"
                   onClick={handleGoogleSignUp}
                 >
                   <ChromeIcon className="md:w-5 md:h-5 h-4 w-4" />Sign up with Google
                 </Button>
-                <Button 
+                <Button
                   type="button"
-                  className="w-full items-center gap-2 bg-white/90 text-black hover:bg-neutral-300" 
+                  className="w-full items-center gap-2 bg-white/90 text-black hover:bg-neutral-300"
                   onClick={handleGithubSignUp}
                 >
                   <GitHubLogoIcon className="md:w-5 md:h-5 h-4 w-4" />Sign up with Github
@@ -219,6 +235,7 @@ export default function SignupComponent() {
           </div>
         </div>
       </div>
-    </div>
+    </div>)}
+  </>
   )
 }

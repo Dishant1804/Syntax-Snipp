@@ -43,7 +43,8 @@ const AuthCheck = ({ children }: any) => {
           duration : 5000
         });
         router.push('/');
-      } finally {
+      } 
+      finally {
         setLoading(false);
       }
     };
