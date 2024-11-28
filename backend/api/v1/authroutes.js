@@ -6,7 +6,7 @@ import rateLimit from "express-rate-limit";
 import authMiddleware from "./middleware/authMiddleware.js";
 import { z } from "zod";
 import passport from "./config/passportConfig.js";
-import { createSession } from "../../helper/tokenGenerator.js";
+import { v4 as uuidv4 } from "uuid";
 
 
 const router = express.Router();
@@ -37,7 +37,7 @@ router.get("/check-session", async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.json({ success: false, message: 'Unauthorized' , valid : false });
+    return res.json({ success: false, message: 'Unauthorized', valid: false });
   }
 
   try {
@@ -92,7 +92,15 @@ router.post("/signup", rateLimiter, async (req, res) => {
       },
     });
 
-    const token = await createSession(user.id);
+    const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
+
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        token,
+      },
+    });
+
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -152,7 +160,15 @@ router.post("/signin", rateLimiter, async (req, res) => {
       });
     }
 
-    const token = await createSession(user.id);
+    const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
+
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        token,
+      },
+    });
+
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -203,15 +219,22 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
       const existingSessions = await prisma.session.findMany({
         where: { userId: user.id, isValid: true },
       });
-  
+
       if (existingSessions.length > 0) {
         await prisma.session.updateMany({
           where: { userId: user.id },
           data: { isValid: false },
         });
       }
-  
-      const token = await createSession(user.id);
+
+      const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
+
+      await prisma.session.create({
+        data: {
+          userId: user.id,
+          token,
+        },
+      });
       res.cookie("token", token, {
         httpOnly: true,
         sameSite: "lax",
@@ -247,16 +270,16 @@ router.get('/google/vscode/callback', passport.authenticate('google-vscode', {
       });
 
       const subscription = await prisma.user.findUnique({
-        where : {
-          email : profile.emails[0].value,
+        where: {
+          email: profile.emails[0].value,
         },
-        select : {
-          isSubscribed : true,
+        select: {
+          isSubscribed: true,
         }
       })
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-      
+      const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
+
 
       res.redirect(`http://localhost:54321/auth/${token}/${subscription.isSubscribed}`);
     } catch (e) {
@@ -311,7 +334,14 @@ router.get('/github/callback', passport.authenticate('github', {
         });
       }
 
-      const newToken = await createSession(user.id);
+      const newToken = jwt.sign({ userId: user.id }, JWT_SECRET);
+
+      await prisma.session.create({
+        data: {
+          userId: user.id,
+          token,
+        },
+      });
 
       res.cookie("token", newToken, {
         httpOnly: true,
@@ -443,10 +473,12 @@ router.post("/logout", authMiddleware, async (req, res) => {
       where: { token: req.cookies.token },
       data: { isValid: false },
     });
+
     res.clearCookie("token", {
       httpOnly: true,
       sameSite: "Lax",
     });
+
     res.json({ message: "Logged out successfully", success: true });
   } catch (error) {
     console.error(error);

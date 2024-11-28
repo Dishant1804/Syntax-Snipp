@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import dotenv from 'dotenv';
+const dotenvParsed = dotenv.config().parsed;
+const JWT_SECRET_MIDDLEWARE = dotenvParsed.JWT_SECRET;
 
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token || req.headers.authorization;
@@ -10,17 +11,11 @@ const authMiddleware = async (req, res, next) => {
   }
 
   try {
-    console.log("above decode")
-    const decoded = jwt.verify(token, JWT_SECRET);
-    console.log("decoded");
+    const decoded = jwt.verify(token, JWT_SECRET_MIDDLEWARE);
     req.user = decoded;
     next();
   } 
   catch (err) {
-    if (err instanceof jwt.JsonWebTokenError) {
-      console.log(err);
-      return res.status(401).json({ "error": "Unauthorized" });
-    }
     return res.status(500).json({ "error": "Internal Server Error" });
   }
 };
