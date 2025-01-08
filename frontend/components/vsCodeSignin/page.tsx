@@ -16,7 +16,6 @@ const VsCodeSigninComponent = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { toast } = useToast();
-  const router = useRouter();
 
   const handleEmail = (e: any) => {
     setEmail(e.target.value);
@@ -33,7 +32,7 @@ const VsCodeSigninComponent = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/signin",
+        "http://localhost:3000/api/v1/auth/signin-vscode",
         data,
       );
 
@@ -44,13 +43,15 @@ const VsCodeSigninComponent = () => {
         toast({
           title: "Error while signing up",
           description: "Something went wrong try again after sometime",
-          duration : 5000,
+          duration: 5000,
         });
       }
 
-      localStorage.setItem("token", response.data.token);
-      router.push("/dashboard");
-
+      if (response.data.success) {
+        window.location.href = response.data.redirectUrl
+      } else {
+        console.error('Authentication failed:', response.data.message);
+      }
       setEmail("");
       setPassword("");
     } catch (error) {
@@ -58,7 +59,7 @@ const VsCodeSigninComponent = () => {
       toast({
         title: "Error while signing up",
         description: "Something went wrong try again after sometime",
-        duration : 5000,
+        duration: 5000,
       });
     }
   };
@@ -71,7 +72,7 @@ const VsCodeSigninComponent = () => {
   return (
     <div className="mx-10 sm:mx-auto max-w-[400px] space-y-6 flex flex-col justify-center items-center h-screen">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">Sign In</h1>
+        <h1 className="text-3xl font-bold text-white">Sign In</h1>
         <p className="text-muted-foreground">
           Welcome back, please sign in to your account.
         </p>
@@ -81,6 +82,7 @@ const VsCodeSigninComponent = () => {
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
+            className="text-white"
               id="email"
               type="email"
               placeholder="Enter your email"
@@ -100,6 +102,7 @@ const VsCodeSigninComponent = () => {
               </Link>
             </div>
             <Input
+            className="text-white"
               id="password"
               type="password"
               placeholder="Enter your password"
@@ -107,7 +110,7 @@ const VsCodeSigninComponent = () => {
               onChange={handlePassword}
             />
           </div>
-          <Button type="submit" className="w-full" onClick={handleSubmitButton}>
+          <Button type="submit" variant={'outline'} className="w-full" onClick={handleSubmitButton}>
             Sign In
           </Button>
         </div>

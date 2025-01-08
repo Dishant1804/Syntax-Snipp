@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SpinnerWithText } from '../components/ui/spinnerWithText';
 
 
-const publicRoutes = ['/', '/login', '/signup', '/signin', '/sharesnippet' , '/docs'];
+const publicRoutes = ['/', '/login', '/signup', '/signin', '/sharesnippet' , '/docs' , '/signin/vscode' , '/google/vscode/callback' , '/http://localhost:54321/auth/'];
 
 const AuthCheck = ({ children }: any) => {
   const router = useRouter();
