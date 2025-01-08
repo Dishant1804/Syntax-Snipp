@@ -182,6 +182,87 @@ router.post("/signin", rateLimiter, async (req, res) => {
   }
 });
 
+router.post("/signin-vscode", rateLimiter, async (req, res) => {
+  const body = req.body;
+  const validation = userSigninSchema.safeParse(body);
+
+  if (!validation.success) {
+    return res
+      .status(401)
+      .json({ message: "Enter proper credentials", success: false });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: req.body.email,
+      },
+      select: {
+        id: true,
+        passwordHash: true,
+      },
+    });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Invalid Credentials", success: false });
+    }
+
+    const isPasswordValid = await compare(req.body.password, user.passwordHash);
+
+    if (!isPasswordValid) {
+      return res
+        .status(401)
+        .json({ message: "Invalid Credentials", success: false });
+    }
+
+    const existingSessions = await prisma.session.findMany({
+      where: { userId: user.id, isValid: true },
+    });
+
+    if (existingSessions.length > 0) {
+      await prisma.session.updateMany({
+        where: { userId: user.id },
+        data: { isValid: false },
+      });
+    }
+
+    const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
+
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        token,
+      },
+    });
+
+    const subscription = await prisma.user.findUnique({
+      where: {
+        email : req.body.email,
+      },
+      select: {
+        isSubscribed: true,
+      }
+    })
+
+    const authUrl = `http://localhost:54321/auth/${token}/${user.isSubscribed}`;
+    
+    res.json({
+      success: true,
+      redirectUrl: authUrl,
+      token,
+      isSubscribed: user.isSubscribed
+    });
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", success: false });
+  }
+});
+
+
 router.get(
   "/google/dashboard",
   passport.authenticate("google-dashboard", {

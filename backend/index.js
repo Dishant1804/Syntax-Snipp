@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 const corsOptions = {
-  origin: ["http://localhost:3001", "*" , "https://github.com/"],
+  origin: ["http://localhost:3001", "*" , "https://github.com/" , "http://localhost:54321"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
