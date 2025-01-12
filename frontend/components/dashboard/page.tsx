@@ -4,12 +4,12 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Sidebar }  from '@/components/sidebar/Page'
 import { SearchComponent } from "../search/Page"
 import { MainSnippetComponent } from "../mainsnippet/page"
-import { useState } from "react"
+import { use, useState } from "react"
 
 
 export default function DashboardComponent() {
   const [isSnippetDeleted , setIsSnippetDeleted] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"allsnippets" | "mysnippets">("allsnippets");
+  const [activeTab, setActiveTab] = useState<"allsnippets" | "mysnippets" | "favorites">("allsnippets");
 
   return (
     <>

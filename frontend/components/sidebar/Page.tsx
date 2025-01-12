@@ -1,13 +1,12 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Flame, Bookmark, Check, LogOut } from "lucide-react";
+import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Bookmark, Check, LogOut } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faLinkedinIn, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { Button } from '../ui/button';
 import axios from 'axios';
@@ -163,34 +162,37 @@ export const Sidebar = () => {
         </div>
         <Separator className="bg-slate-400/20" />
         <div className="flex my-4 flex-col gap-2 px-6">
-          {[
-            { icon: LayoutDashboard, text: "Dashboard", redirectUri: '/dashboard' },
-            { icon: Star, text: "Favorites", redirectUri: '/favorites' },
-            { icon: MessageSquareDiff, text: "Create Snippet", redirectUri: '/createsnippet' },
-            { icon: SquareUser, text: "Profile", redirectUri: '/profile' },
-            { icon: LogOut, text: "Logout", onClick: handleLogoutClick },
-          ].map(({ icon: Icon, text, redirectUri, onClick }) => (
-            onClick ? (
-              <div
-                key={text}
-                onClick={onClick}
-                className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer"
-              >
-                <Icon className="h-5 w-5" />
-                <h1>{text}</h1>
-              </div>
-            ) : (
-              <Link
-                href={`http://localhost:3001${redirectUri}`}
-                key={text}
-                className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === redirectUri ? 'bg-[#272729] text-white' : 'text-white/90'
-                  }`}
-              >
-                <Icon className="h-5 w-5" />
-                <h1>{text}</h1>
-              </Link>
-            )
-          ))}
+          <Link
+            href="http://localhost:3001/dashboard"
+            className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/dashboard" ? "bg-[#272729] text-white" : "text-white/90"
+              }`}
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            <h1>Dashboard</h1>
+          </Link>
+          <Link
+            href="http://localhost:3001/createsnippet"
+            className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/createsnippet" ? "bg-[#272729] text-white" : "text-white/90"
+            }`}
+          >
+            <MessageSquareDiff className="h-5 w-5" />
+            <h1>Create Snippet</h1>
+          </Link>
+          <Link
+            href="http://localhost:3001/profile"
+            className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/profile" ? "bg-[#272729] text-white" : "text-white/90"
+            }`}
+          >
+            <SquareUser className="h-5 w-5" />
+            <h1>Profile</h1>
+          </Link>
+          <div
+            onClick={handleLogoutClick}
+            className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer"
+          >
+            <LogOut className="h-5 w-5" />
+            <h1>Logout</h1>
+          </div>
         </div>
         <Separator className="bg-slate-400/20" />
         <div className="my-8 flex flex-col gap-3">
@@ -229,9 +231,6 @@ export const Sidebar = () => {
           <Link href={'https://x.com/MiyaniDishant'} target='_blank' >
             <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faXTwitter} />
           </Link>
-        </div>
-        <div className='flex flex-row justify-center items-center text-white/80'>
-          Made with&nbsp;<FontAwesomeIcon icon={faHeart} className='h-4 w-4 px-1' />&nbsp;by&nbsp; <Link href={'https://github.com/dishant1804/'} className='hover:underline'>Dishant</Link>
         </div>
       </div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

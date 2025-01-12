@@ -22,7 +22,7 @@ interface UserProfile {
   email: string;
 }
 
-export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" }) => {
+export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" | "favorites"}) => {
   const [loading, setLoading] = useState<boolean>(true);
   const snippet = useSelector((state: RootState) => state.snippet.selectedSnippet);
   const [isFavorite, setIsFavorite] = useState<boolean>(snippet?.favorite || false);
