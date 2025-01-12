@@ -19,7 +19,7 @@ passport.use('google-dashboard' , new GoogleStrategy({
 passport.use('google-vscode' , new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: `http://localhost:3000/api/v1/auth/google/vscode/callback`,
+  callbackURL: `${process.env.BACKEND_URL}/api/v1/auth/google/vscode/callback`,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     const data = { profile };
