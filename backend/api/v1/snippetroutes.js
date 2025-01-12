@@ -419,3 +419,60 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
 });
 
 export default router;
+
+/**
+ * Display user's favorite snippets
+ */
+router.get('/favoritesnippets', authMiddleware, SnippetLimiter, async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const subscription = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    const favoriteSnippets = await prisma.snippet.findMany({
+      where: {
+        userId: userId,
+        favorite: true
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+            email: true,
+          }
+        },
+        tags: {
+          include: {
+            tag: true,
+          }
+        }
+      },
+    });
+
+    if (!favoriteSnippets || favoriteSnippets.length === 0) {
+      return res.status(200).json({ message: "No favorite snippets found for this user", snippets: [] });
+    }
+
+    const formattedSnippets = favoriteSnippets.map(snippet => ({
+      id: snippet.id,
+      title: snippet.title,
+      description: snippet.description,
+      content: snippet.content,
+      favorite: snippet.favorite,
+      user: snippet.user,
+      language: snippet.language,
+      createdAt: snippet.createdAt,
+      updatedAt: snippet.updatedAt,
+      isPrivate: snippet.isPrivate,
+      tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
+    }));
+
+    return res.status(200).json({ snippets: formattedSnippets, isSubscribed: subscription.isSubscribed });
+  }
+  catch (e) {
+    console.error(e);
+    return res.status(500).json({ "error": "Internal server error" });
+  }
+});
