@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 const corsOptions = {
-  origin: ["http://localhost:3001", "*" , "https://github.com/" , "http://localhost:54321"],
+  origin: ["http://localhost:3001", "*" , "https://github.com/" , "http://localhost:54321" , "https://syntax-snipp.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
