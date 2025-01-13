@@ -5,6 +5,7 @@ const JWT_SECRET_MIDDLEWARE = dotenvParsed.JWT_SECRET;
 
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token || req.headers.authorization;
+  console.log(token)
 
   if (!token) {
     return res.status(401).json({ "error": "Unauthorized" , "success" : false });

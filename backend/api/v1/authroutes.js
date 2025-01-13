@@ -104,6 +104,9 @@ router.post("/signup", rateLimiter, async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
+      secure: true,
+      domain: "syntax-snipp.xyz",
+      path: "/"
     });
     return res.status(201).json({ status: "signedup", success: true });
   } catch (e) {
@@ -172,6 +175,9 @@ router.post("/signin", rateLimiter, async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
+      secure: true,
+      domain: "syntax-snipp.xyz",
+      path: "/"
     });
     return res.json({ status: "signedin", success: true });
   } catch (e) {
