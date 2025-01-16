@@ -55,7 +55,7 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
       if(activeTabInternal === "mysnippets"){
         endpoint =  `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/mysnippets`;
       }
-      
+
       const response = await axios.get(endpoint, {
         withCredentials: true,
       });
@@ -165,7 +165,7 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
                 </div>
               ))
             ) : (
-              <div>No snippets found for "{debouncedSearchTerm}"</div>
+              <div>No snippets found for &quot;{debouncedSearchTerm}&quot;</div>
             )
           )}
         </div>
