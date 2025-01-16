@@ -34,39 +34,42 @@ interface SearchComponentProps {
   setActiveTab: React.Dispatch<SetStateAction<TabType>>;
 }
 
-const SnippetCard = React.memo(({ 
-  snippet, 
-  isSelected, 
-  onClick 
-}: { 
-  snippet: Snippet; 
-  isSelected: boolean; 
-  onClick: () => void;
-}) => (
-  <div
-    className={`h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 transition ease-in-out duration-100 cursor-pointer ${
-      isSelected ? "bg-[#1a1a1a]/90 border-neutral-500/50" : "hover:bg-[#272729]/30"
-    }`}
-    onClick={onClick}
-  >
-    <div className="text-lg font-bold flex">{snippet.user.username}</div>
-    <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
-    <div className="text-sm font-mono mt-4 flex flex-wrap">
-      {truncateDescription(snippet.description, 18)}
+const SnippetCard = Object.assign(
+  React.memo(({ 
+    snippet, 
+    isSelected, 
+    onClick 
+  }: { 
+    snippet: Snippet; 
+    isSelected: boolean; 
+    onClick: () => void;
+  }) => (
+    <div
+      className={`h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 transition ease-in-out duration-100 cursor-pointer ${
+        isSelected ? "bg-[#1a1a1a]/90 border-neutral-500/50" : "hover:bg-[#272729]/30"
+      }`}
+      onClick={onClick}
+    >
+      <div className="text-lg font-bold flex">{snippet.user.username}</div>
+      <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
+      <div className="text-sm font-mono mt-4 flex flex-wrap">
+        {truncateDescription(snippet.description, 18)}
+      </div>
+      <div className="mt-2">
+        {snippet.tags.map((tag) => (
+          <Badge
+            key={tag}
+            variant="secondary"
+            className="bg-[#272729] mr-1.5 my-1 text-white/90 hover:text-black rounded-xl text-sm font-normal"
+          >
+            {tag}
+          </Badge>
+        ))}
+      </div>
     </div>
-    <div className="mt-2">
-      {snippet.tags.map((tag) => (
-        <Badge
-          key={tag}
-          variant="secondary"
-          className="bg-[#272729] mr-1.5 my-1 text-white/90 hover:text-black rounded-xl text-sm font-normal"
-        >
-          {tag}
-        </Badge>
-      ))}
-    </div>
-  </div>
-));
+  )), 
+  { displayName: 'SnippetCard' }
+);
 
 export const SearchComponent: React.FC<SearchComponentProps> = ({ 
   isSnippetDeleted, 
@@ -83,11 +86,11 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
   const dispatch = useDispatch();
   const debouncedSearchTerm = useDebounce(searchItem, 300);
 
-  const endpoints = {
+  const endpoints = useMemo(() => ({
     allsnippets: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets`,
     mysnippets: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/mysnippets`,
     favorites: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/favoritesnippets`
-  };
+  }), []);
 
   const fetchSnippets = useCallback(async () => {
     try {
@@ -116,7 +119,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [activeTabInternal, dispatch , endpoints]);
+  }, [activeTabInternal, dispatch, endpoints]);
 
   useEffect(() => {
     fetchSnippets();
@@ -191,5 +194,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
     </div>
   );
 };
+
+SearchComponent.displayName = 'SearchComponent';
 
 export default SearchComponent;
