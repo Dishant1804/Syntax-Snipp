@@ -48,12 +48,12 @@ export const Sidebar = () => {
   };
 
   const createRazorpayOrder = async (amount: number) => {
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       amount: amount * 100,
       currency: "INR"
     });
 
-    let config = {
+    const config = {  
       method: "post",
       maxBodyLength: Infinity,
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/payments/orders`,

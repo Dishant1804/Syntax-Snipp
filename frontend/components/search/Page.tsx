@@ -116,7 +116,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [activeTabInternal, dispatch]);
+  }, [activeTabInternal, dispatch , endpoints]);
 
   useEffect(() => {
     fetchSnippets();

@@ -129,7 +129,7 @@ const VsCodeSigninComponent = () => {
             Sign in with Google
           </Button>
           <div className="mt-4 text-center text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline" prefetch={false}>
               Sign Up
             </Link>

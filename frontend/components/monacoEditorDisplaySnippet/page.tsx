@@ -3,6 +3,7 @@ import { Editor, Monaco } from '@monaco-editor/react';
 import { customTheme } from '@/helpers/helper';
 import { Copy, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { editor } from 'monaco-editor';
 
 type SnippetContent = {
   content: string;
@@ -20,20 +21,21 @@ export const MonacoEditorDisplaySnippetComponent = ({ content, language }: Snipp
     monacoRef.current = monaco;
   }
 
-  const handleEditorDidMount = (editor: any, monaco: Monaco) => {
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
     monaco.editor.setTheme('customTheme');
 
     editor.updateOptions({
       readOnly: true,
-      cursorBlinking: 'hidden',
+      cursorBlinking: 'smooth',
       renderLineHighlight: 'none',
     });
 
-    editor._domElement.style.caretColor = '#272729';
+    const editorElement = editor.getContainerDomNode();
+    editorElement.style.caretColor = '#272729';
   }
 
   useEffect(() => {
-    const updateDimensions = () => {
+    const updateDimensions = (): void => {
       if (containerRef.current) {
         setDimensions({
           width: `${containerRef.current.clientWidth}px`

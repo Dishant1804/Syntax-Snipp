@@ -166,7 +166,7 @@ export default function SigninComponent() {
                     </Button>
                   </div>
                   <div className="text-sm">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link
                       href={"/signup"}
                       prefetch={false}

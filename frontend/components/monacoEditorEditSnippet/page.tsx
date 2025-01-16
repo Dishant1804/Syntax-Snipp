@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { LockKeyholeIcon } from 'lucide-react';
+import { editor } from 'monaco-editor';
 
 type SnippetContents = {
   title: string;
@@ -22,7 +23,7 @@ type SnippetContents = {
 
 const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, content, setContent, isPrivate, setIsPrivate }: SnippetContents) => {
   const monacoRef = useRef<Monaco | null>(null);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [dimensions, setDimensions] = useState({ width: '100%' });
@@ -34,7 +35,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
     monacoRef.current = monaco;
   };
 
-  const handleEditorDidMount = (editor: any, monaco: Monaco) => {
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
     monaco.editor.setTheme('customTheme');
     editorRef.current = editor;
     editor.setValue(content);

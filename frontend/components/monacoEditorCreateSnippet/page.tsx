@@ -31,7 +31,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
     monacoRef.current = monaco;
   }
 
-  const handleEditorDidMount = (editor: any, monaco: Monaco) => {
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
     monaco.editor.setTheme('customTheme');
     editorRef.current = editor;
   }
