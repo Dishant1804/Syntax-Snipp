@@ -30,7 +30,7 @@ const ProfileComponent = ({ option }: { option: string }) => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/v1/auth/user/profile', {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user/profile`, {
         withCredentials: true,
       });
 

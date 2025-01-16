@@ -11,7 +11,7 @@ const Features = () => {
     <div className="flex flex-col w-full max-w-7xl gap-6">
       <div className="flex flex-col gap-4 lg:flex-row w-full justify-between items-center md:px-8 md:py-24">
         <div className="flex flex-col">
-          <h1 className="text-md md:font-bold md:text-3xl pb-4 flex gap-2"><span className="bg-neutral-600 w-3"></span>Snippets : Pro's way to write code</h1>
+          <h1 className="text-md md:font-bold md:text-3xl pb-4 flex gap-2"><span className="bg-neutral-600 w-3"></span>Snippets : Pro&apos;s way to write code</h1>
           <p className="pb-4 w-full max-w-lg hidden md:flex">Code snippets help you avoid repeating the same code, streamlining your development process.</p>
           <ul className="flex gap-4 flex-col md:pl-8 text-white/90">
             <li className="gap-3 flex flex-row items-center">

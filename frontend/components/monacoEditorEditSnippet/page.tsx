@@ -50,7 +50,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
     };
 
     const fetchProfile = async() => {
-      const profileResponse = await axios.get('http://localhost:3000/api/v1/auth/user/profile', {
+      const profileResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user/profile`, {
         withCredentials: true,
       });
 
@@ -85,7 +85,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
     };
 
     try {
-      const response = await axios.patch(`http://localhost:3000/api/v1/snippet/updatesnippet/${id}`, data, {
+      const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/updatesnippet/${id}`, data, {
         withCredentials: true
       });
 

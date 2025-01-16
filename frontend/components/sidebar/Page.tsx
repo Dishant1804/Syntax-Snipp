@@ -56,7 +56,7 @@ export const Sidebar = () => {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "http://localhost:3000/api/v1/payments/orders",
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/payments/orders`,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -93,7 +93,7 @@ export const Sidebar = () => {
           amount: amount,
         }
         try {
-          const activateSubscription = await axios.post('http://localhost:3000/api/v1/payments/activate-subscription', data, {
+          const activateSubscription = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/payments/activate-subscription`, data, {
             withCredentials: true,
           });
           if (!activateSubscription.data.success) {
@@ -163,7 +163,7 @@ export const Sidebar = () => {
         <Separator className="bg-slate-400/20" />
         <div className="flex my-4 flex-col gap-2 px-6">
           <Link
-            href="http://localhost:3001/dashboard"
+            href="/dashboard"
             className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/dashboard" ? "bg-[#272729] text-white" : "text-white/90"
               }`}
           >
@@ -171,7 +171,7 @@ export const Sidebar = () => {
             <h1>Dashboard</h1>
           </Link>
           <Link
-            href="http://localhost:3001/createsnippet"
+            href="/createsnippet"
             className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/createsnippet" ? "bg-[#272729] text-white" : "text-white/90"
             }`}
           >
@@ -179,7 +179,7 @@ export const Sidebar = () => {
             <h1>Create Snippet</h1>
           </Link>
           <Link
-            href="http://localhost:3001/profile"
+            href="/profile"
             className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/profile" ? "bg-[#272729] text-white" : "text-white/90"
             }`}
           >

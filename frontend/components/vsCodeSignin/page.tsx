@@ -32,7 +32,7 @@ const VsCodeSigninComponent = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/signin-vscode",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/signin-vscode`,
         data,
       );
 
@@ -66,7 +66,7 @@ const VsCodeSigninComponent = () => {
 
   const handleGoogleSignIn = async () => {
     window.location.href =
-      "http://localhost:3000/api/v1/auth/google/vscode";
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google/vscode`;
   };
 
   return (

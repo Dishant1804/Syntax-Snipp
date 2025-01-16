@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LockKeyholeIcon } from 'lucide-react';
+import { editor } from 'monaco-editor';
 
 type SnippetContents = {
   title: string,
@@ -19,7 +20,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
   const monacoRef = useRef<Monaco | null>(null);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: '100%' });
   const [selectedLanguage, setSelectedLanguage] = useState('javascript');
@@ -45,7 +46,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
     };
 
     const fetchProfile = async() => {
-      const profileResponse = await axios.get('http://localhost:3000/api/v1/auth/user/profile', {
+      const profileResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user/profile`, {
         withCredentials: true,
       });
 
@@ -78,7 +79,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/snippet/createsnippet', data, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/createsnippet`, data, {
         withCredentials: true,
       });
       

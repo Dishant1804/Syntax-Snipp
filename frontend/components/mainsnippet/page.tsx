@@ -39,7 +39,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/auth/user/profile", {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user/profile`, {
         withCredentials: true,
       });
 
@@ -68,7 +68,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
 
   useEffect(() => {
     if (snippet) {
-      const snippetUrl = `http://localhost:3001/sharesnippet/${snippet.id}`;
+      const snippetUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/sharesnippet/${snippet.id}`;
       setUrl(snippetUrl);
       setLoading(true);
       setIsFavorite(snippet.favorite);
@@ -102,7 +102,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
 
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/snippet/updatesnippet/${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/updatesnippet/${id}`,
         updateData,
         {
           withCredentials: true,
@@ -120,7 +120,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
 
   const handleDeleteClick = async () => {
     const id = snippet.id;
-    const response = await axios.delete(`http://localhost:3000/api/v1/snippet/deletesnippet/${id}`, {
+    const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/deletesnippet/${id}`, {
       withCredentials: true,
     })
 

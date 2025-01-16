@@ -33,7 +33,7 @@ const ShareSnippetComponent: React.FC = () => {
 
       if (id && id !== 'null') {
         try {
-          const response = await axios.get(`http://localhost:3000/api/v1/snippet/sharesnippet/${id}`);
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/sharesnippet/${id}`);
           setSnippet(response.data.snippet);
         } catch (error) {
           console.error('Error fetching snippet:', error);

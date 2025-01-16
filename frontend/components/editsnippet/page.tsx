@@ -12,7 +12,7 @@ import axios from 'axios';
 import MonacoEditorEditSnippetComponent from '../monacoEditorEditSnippet/page';
 
 const EditSnippetComponent = () => {
-  const [snippet, setSnippet] = useState<{ title?: string; description?: string; tags?: string[]; content?: string; isPrivate?: boolean }>({});
+  // const [snippet, setSnippet] = useState<{ title?: string; description?: string; tags?: string[]; content?: string; isPrivate?: boolean }>({});
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
@@ -44,12 +44,12 @@ const EditSnippetComponent = () => {
 
   const fetchSnippet = async (snippetId: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/v1/snippet/displaysnippet/${snippetId}`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displaysnippet/${snippetId}`, {
         withCredentials: true,
       });
 
       if (response.data.success) {
-        setSnippet(response.data.snippet);
+        // setSnippet(response.data.snippet);
         setTitle(response.data.snippet.title || '');
         setDescription(response.data.snippet.description || '');
         setTags(response.data.snippet.tags || []);
