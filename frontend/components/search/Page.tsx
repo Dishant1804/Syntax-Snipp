@@ -1,4 +1,4 @@
-import React, { SetStateAction, useEffect, useMemo, useCallback, useState } from "react";
+import { SetStateAction, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -16,92 +16,52 @@ type Snippet = {
   id: string;
   title: string;
   description: string;
-  user: { username: string; email: string };
+  user: {
+    username: string;
+  };
   tags: string[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt : string;
+  updatedAt : string;
   isPrivate: boolean;
-  content: string;
-  language: string;
-  favorite: boolean;
 };
 
-type TabType = "allsnippets" | "mysnippets" | "favorites";
-
-interface SearchComponentProps {
-  isSnippetDeleted: boolean;
-  setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>;
-  setActiveTab: React.Dispatch<SetStateAction<TabType>>;
-}
-
-const SnippetCard = Object.assign(
-  React.memo(({ 
-    snippet, 
-    isSelected, 
-    onClick 
-  }: { 
-    snippet: Snippet; 
-    isSelected: boolean; 
-    onClick: () => void;
-  }) => (
-    <div
-      className={`h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 transition ease-in-out duration-100 cursor-pointer ${
-        isSelected ? "bg-[#1a1a1a]/90 border-neutral-500/50" : "hover:bg-[#272729]/30"
-      }`}
-      onClick={onClick}
-    >
-      <div className="text-lg font-bold flex">{snippet.user.username}</div>
-      <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
-      <div className="text-sm font-mono mt-4 flex flex-wrap">
-        {truncateDescription(snippet.description, 18)}
-      </div>
-      <div className="mt-2">
-        {snippet.tags.map((tag) => (
-          <Badge
-            key={tag}
-            variant="secondary"
-            className="bg-[#272729] mr-1.5 my-1 text-white/90 hover:text-black rounded-xl text-sm font-normal"
-          >
-            {tag}
-          </Badge>
-        ))}
-      </div>
-    </div>
-  )), 
-  { displayName: 'SnippetCard' }
-);
-
-export const SearchComponent: React.FC<SearchComponentProps> = ({ 
-  isSnippetDeleted, 
-  setIsSnippetDeleted,
-  setActiveTab 
-}) => {
+export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetDeleted: boolean, setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, setActiveTab: React.Dispatch<SetStateAction<"allsnippets" | "mysnippets" | "favorites">>; }) => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchItem, setSearchItem] = useState("");
-  const [activeTabInternal, setActiveTabInternal] = useState<TabType>("allsnippets");
+  const [searchItem, setSearchItem] = useState<string>("");
+  const [activeTabInternal, setActiveTabInternal] = useState<"allsnippets" | "mysnippets" | "favorites">("allsnippets");
   const [selectedSnippetId, setSelectedSnippetId] = useState<string | null>(null);
 
-  const dispatch = useDispatch();
   const debouncedSearchTerm = useDebounce(searchItem, 300);
+  const dispatch = useDispatch();
 
-  const endpoints = useMemo(() => ({
-    allsnippets: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets`,
-    mysnippets: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/mysnippets`,
-    favorites: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/favoritesnippets`
-  }), []);
+  useEffect(() => {
+    fetchSnippets();
+  }, [dispatch, activeTabInternal, isSnippetDeleted]);
 
-  const fetchSnippets = useCallback(async () => {
+  const fetchSnippets = async () => {
     try {
       setLoading(true);
       setError(null);
+      let endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets` 
+      
+      if(activeTabInternal === "allsnippets"){
+        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets`
+      }
+      if(activeTabInternal === "favorites"){
+        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/favoritesnippets`
+      }
+      if(activeTabInternal === "mysnippets"){
+        endpoint =  `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/mysnippets`;
+      }
+      
+      const response = await axios.get(endpoint, {
+        withCredentials: true,
+      });
 
-      const endpoint = endpoints[activeTabInternal];
-      const response = await axios.get(endpoint, { withCredentials: true });
-      
       let fetchedSnippets = response.data.allSnippets || response.data.snippets || [];
-      
+
       if (activeTabInternal === "allsnippets") {
         fetchedSnippets = fetchedSnippets.filter((snippet: Snippet) => !snippet.isPrivate);
       }
@@ -112,42 +72,38 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
         dispatch(setSelectedSnippet(fetchedSnippets[0]));
         setSelectedSnippetId(fetchedSnippets[0].id);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
       setError("Failed to fetch snippets");
       setSnippets([]);
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
-  }, [activeTabInternal, dispatch, endpoints]);
-
-  useEffect(() => {
-    fetchSnippets();
-  }, [fetchSnippets, isSnippetDeleted]);
+  };
 
   const filteredSnippets = useMemo(() => {
-    const searchTerm = debouncedSearchTerm.toLowerCase();
     return snippets.filter((snippet) =>
-      snippet.title.toLowerCase().includes(searchTerm) ||
-      snippet.description.toLowerCase().includes(searchTerm) ||
-      snippet.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
-      snippet.user.username.toLowerCase().includes(searchTerm)
+      snippet.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      snippet.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      snippet.tags.some((tag) => tag.toLowerCase().includes(debouncedSearchTerm.toLowerCase())) ||
+      snippet.user.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
   }, [snippets, debouncedSearchTerm]);
 
-  const handleSnippetClick = useCallback((snippet: Snippet) => {
+  const handleSnippetClick = (snippet: Snippet) => {
+    //@ts-ignore
     dispatch(setSelectedSnippet(snippet));
     setSelectedSnippetId(snippet.id);
-  }, [dispatch]);
-
-  const handleTabChange = useCallback((value: string) => {
-    setActiveTabInternal(value as TabType);
-    setActiveTab(value as TabType);
-  }, [setActiveTab]);
+  };
+  const handleTabChange = (value: string) => {
+    setActiveTabInternal(value as "allsnippets" | "mysnippets" | "favorites");
+    setActiveTab(value as "allsnippets" | "mysnippets" | "favorites");
+  };
 
   return (
     <div className="flex flex-col h-full text-white/90">
-      <div className="flex flex-row justify-between px-10 py-3">
+      <div className="flex flex-row justify-between px-10 py-3 text-white/90">
         <h1 className="text-xl font-bold">Search Snippets</h1>
         <Tabs value={activeTabInternal} onValueChange={handleTabChange} className="w-auto items-center justify-center flex">
           <TabsList className="flex flex-row gap-2 bg-[#272729]">
@@ -180,21 +136,42 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
           ) : snippets.length === 0 ? (
             <div>No snippets found</div>
           ) : (
-            filteredSnippets.map((snippet) => (
-              <SnippetCard
-                key={snippet.id}
-                snippet={snippet}
-                isSelected={selectedSnippetId === snippet.id}
-                onClick={() => handleSnippetClick(snippet)}
-              />
-            ))
+            filteredSnippets.length > 0 ? (
+              filteredSnippets.map((snippet) => (
+                <div
+                  key={snippet.id}
+                  className={`h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 transition ease-in-out duration-100 cursor-pointer ${selectedSnippetId === snippet.id
+                      ? "bg-[#1a1a1a]/90 border-neutral-500/50"
+                      : "hover:bg-[#272729]/30"
+                    }`}
+                  onClick={() => handleSnippetClick(snippet)}
+                >
+                  <div className="text-lg font-bold flex">{snippet.user.username}</div>
+                  <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
+                  <div className="text-sm font-mono mt-4 flex flex-wrap">
+                    {truncateDescription(snippet.description, 18)}
+                  </div>
+                  <div className="mt-2">
+                    {snippet.tags.map((tag: string) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="bg-[#272729] mr-1.5 my-1 text-white/90 hover:text-black rounded-xl text-sm font-normal cursor-pointer"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div>No snippets found for "{debouncedSearchTerm}"</div>
+            )
           )}
         </div>
       </ScrollArea>
     </div>
   );
 };
-
-SearchComponent.displayName = 'SearchComponent';
 
 export default SearchComponent;
