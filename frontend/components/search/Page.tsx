@@ -84,9 +84,9 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
   const debouncedSearchTerm = useDebounce(searchItem, 300);
 
   const endpoints = {
-    allsnippets: "http://localhost:3000/api/v1/snippet/displayallsnippets",
-    mysnippets: "http://localhost:3000/api/v1/snippet/mysnippets",
-    favorites: "http://localhost:3000/api/v1/snippet/favoritesnippets"
+    allsnippets: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets`,
+    mysnippets: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/mysnippets`,
+    favorites: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/favoritesnippets`
   };
 
   const fetchSnippets = useCallback(async () => {

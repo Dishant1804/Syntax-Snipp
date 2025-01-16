@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Code, LayoutDashboard, Star, MessageSquareDiff, SquareUser, Bookmark, Check, LogOut } from "lucide-react";
+import { Code, LayoutDashboard, MessageSquareDiff, SquareUser, Bookmark, Check, LogOut } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faGithub, faLinkedinIn, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { Button } from '../ui/button';
 import axios from 'axios';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
 import { usePathname } from 'next/navigation';

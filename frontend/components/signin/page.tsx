@@ -45,7 +45,7 @@ export default function SigninComponent() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/signin",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/signin`,
         { email, password },
         { withCredentials: true }
       );
@@ -76,12 +76,12 @@ export default function SigninComponent() {
 
   const handleGoogleSignIn = () => {
     setLoading(true);
-    window.location.href = "http://localhost:3000/api/v1/auth/google/dashboard";
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google/dashboard`;
   };
 
   const handleGithubSignIn = () => {
     setLoading(true);
-    window.location.href = "http://localhost:3000/api/v1/auth/github";
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
   };
 
   return (

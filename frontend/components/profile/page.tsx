@@ -65,7 +65,7 @@ const ProfileComponent = ({ option }: { option: string }) => {
         password: password || undefined
       }
 
-      const response = await axios.patch('http://localhost:3000/api/v1/auth/updateprofile', data, {
+      const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/updateprofile`, data, {
         withCredentials: true,
       });
 

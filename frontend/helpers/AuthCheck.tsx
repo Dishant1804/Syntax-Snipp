@@ -23,7 +23,7 @@ const AuthCheck = ({ children }: any) => {
       }
 
       try {
-        const response = await axios.get('http://localhost:3000/api/v1/auth/check-session', {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/check-session`, {
           withCredentials: true,
         });
 

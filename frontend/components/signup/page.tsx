@@ -78,7 +78,7 @@ export default function SignupComponent() {
     const data = { username, email, password }
 
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/auth/signup", data, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/signup`, data, {
         withCredentials: true,
       })
 
@@ -119,12 +119,12 @@ export default function SignupComponent() {
 
   const handleGithubSignUp = () => {
     setLoading(true)
-    window.location.href = 'http://localhost:3000/api/v1/auth/github'
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`
   }
 
   const handleGoogleSignUp = () => {
     setLoading(true)
-    window.location.href = "http://localhost:3000/api/v1/auth/google/dashboard"
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google/dashboard`
   }
 
   return (<> {loading ? (

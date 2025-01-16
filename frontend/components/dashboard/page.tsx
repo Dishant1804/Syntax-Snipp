@@ -4,7 +4,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Sidebar }  from '@/components/sidebar/Page'
 import { SearchComponent } from "../search/Page"
 import { MainSnippetComponent } from "../mainsnippet/page"
-import { use, useState } from "react"
+import { useState } from "react"
 
 
 export default function DashboardComponent() {
