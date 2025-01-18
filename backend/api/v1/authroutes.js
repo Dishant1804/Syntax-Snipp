@@ -103,8 +103,8 @@ router.post("/signup", rateLimiter, async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
-      // secure: true,
+      sameSite: "none",
+      secure: true,
     });
     return res.status(201).json({ status: "signedup", success: true });
   } catch (e) {
@@ -320,8 +320,8 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
       });
       res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "lax",
-        // secure: true,
+        sameSite: "none",
+        secure: true,
       });
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (e) {
