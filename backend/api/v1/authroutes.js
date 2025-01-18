@@ -103,8 +103,8 @@ router.post("/signup", rateLimiter, async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: "lax",
+      // secure: true,
     });
     return res.status(201).json({ status: "signedup", success: true });
   } catch (e) {
@@ -172,8 +172,8 @@ router.post("/signin", rateLimiter, async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "none",
-      secure : true,
+      sameSite: "lax",
+      // secure : true,
     });
     return res.json({ status: "signedin", success: true });
   } catch (e) {
@@ -320,8 +320,8 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
       });
       res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "none",
-        secure: true,
+        sameSite: "lax",
+        // secure: true,
       });
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (e) {
@@ -429,14 +429,14 @@ router.get('/github/callback', passport.authenticate('github', {
 
       res.cookie("token", newToken, {
         httpOnly: true,
-        sameSite: "none",
-        secure : true,
+        sameSite: "lax",
+        // secure : true,
       });
 
       res.cookie("githubToken", token, {
         httpOnly: true,
-        sameSite: "none",
-        secure : true,
+        sameSite: "lax",
+        // secure : true,
       });
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (error) {
@@ -562,8 +562,8 @@ router.post("/logout", authMiddleware, async (req, res) => {
 
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "none",
-      secure : true
+      sameSite: "lax",
+      // secure : true
     });
 
     res.json({ message: "Logged out successfully", success: true });
