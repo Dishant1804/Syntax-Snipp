@@ -14,7 +14,10 @@ const authMiddleware = async (req, res, next) => {
 
   try {
     console.log("before decoded")
-    const decoded = jwt.verify(token, JWT_SECRET_MIDDLEWARE);
+    console.log("token : ", token)
+    // console.log("dotenv : " , JWT_SECRET_MIDDLEWARE);
+    console.log("secret :" , process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("after decoded");
     req.user = decoded;
     console.log("after setting token")
