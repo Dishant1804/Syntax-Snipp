@@ -12,7 +12,7 @@ const SnippetLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 
-router.get('/easter' , (req,res) => {
+router.get('/easter', (req, res) => {
   res.send("Congratulations");
 })
 
@@ -22,15 +22,15 @@ router.get('/easter' , (req,res) => {
 router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) => {
   const { title, content, description, tags, favorite, language, isPrivate } = req.body;
   const userId = req.user.userId;
-
+  console.log("checking details");
   if (!title || !content || !description) {
     return res.status(400).json({ "error": "Title, content, and description are required" });
   }
 
   try {
-
+    console.log("checking subs")
     const subscription = await prisma.user.findUnique({
-      where: { id : userId }
+      where: { id: userId }
     });
 
     if (!subscription || !subscription.isSubscribed) {
@@ -39,6 +39,7 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
       });
 
       if (snippetCount >= 100) {
+        console.log("inside count")
         return res.status(403).json({ "error": "Snippet limit reached. You can only create up to 100 snippets." });
       }
     }
@@ -47,7 +48,7 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
       data: {
         title: title,
         content: content,
-        description: description, 
+        description: description,
         userId: userId,
         favorite: favorite,
         language: language,
@@ -126,7 +127,7 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
 
   try {
     const subscription = await prisma.user.findUnique({
-      where: { id : userId }
+      where: { id: userId }
     });
 
     const snippet = await prisma.snippet.findUnique({
@@ -137,7 +138,7 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
         user: {
           select: {
             username: true,
-            email : true,
+            email: true,
           }
         },
         tags: {
@@ -161,7 +162,7 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
       tags: snippet.tags.map(tagRelation => tagRelation.tag.name),
     };
 
-    return res.status(200).json({ snippet: formattedSnippet , success : true , isSubscribed: subscription.isSubscribed});
+    return res.status(200).json({ snippet: formattedSnippet, success: true, isSubscribed: subscription.isSubscribed });
   }
   catch (e) {
     console.log(e);
@@ -174,10 +175,10 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
  */
 router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, res) => {
   const userId = req.user.userId;
-  
+
   try {
     const subscription = await prisma.user.findUnique({
-      where: { id : userId }
+      where: { id: userId }
     });
 
     const allSnippets = await prisma.snippet.findMany({
@@ -185,7 +186,7 @@ router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, re
         user: {
           select: {
             username: true,
-            email : true,
+            email: true,
           }
         },
         tags: {
@@ -209,7 +210,7 @@ router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, re
       tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
     }));
 
-    return res.status(200).json({ allSnippets: formattedSnippets , isSubscribed: subscription.isSubscribed})
+    return res.status(200).json({ allSnippets: formattedSnippets, isSubscribed: subscription.isSubscribed })
 
   }
   catch (e) {
@@ -226,7 +227,7 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
 
   try {
     const subscription = await prisma.user.findUnique({
-      where: { id : userId }
+      where: { id: userId }
     });
 
     const userSnippets = await prisma.snippet.findMany({
@@ -237,7 +238,7 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
         user: {
           select: {
             username: true,
-            email : true,
+            email: true,
           }
         },
         tags: {
@@ -258,15 +259,15 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
       description: snippet.description,
       content: snippet.content,
       favorite: snippet.favorite,
-      user : snippet.user,
-      language : snippet.language,
-      createdAt : snippet.createdAt,
-      updatedAt : snippet.updatedAt,
-      isPrivate : snippet.isPrivate,
+      user: snippet.user,
+      language: snippet.language,
+      createdAt: snippet.createdAt,
+      updatedAt: snippet.updatedAt,
+      isPrivate: snippet.isPrivate,
       tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
     }));
 
-    return res.status(200).json({ snippets: formattedSnippets , isSubscribed : subscription.isSubscribed });
+    return res.status(200).json({ snippets: formattedSnippets, isSubscribed: subscription.isSubscribed });
   }
   catch (e) {
     console.error(e);
@@ -299,7 +300,7 @@ router.delete('/deletesnippet/:id', authMiddleware, SnippetLimiter, async (req, 
       }
     })
 
-    return res.status(200).json({ "message": "Snippet deleted" , "success" : true });
+    return res.status(200).json({ "message": "Snippet deleted", "success": true });
   }
   catch (e) {
     console.log(e);
@@ -317,7 +318,7 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
 
   try {
     const subscription = await prisma.user.findUnique({
-      where: { id : userId }
+      where: { id: userId }
     });
 
     const toUpdateSnippet = await prisma.snippet.findFirst({
@@ -415,7 +416,7 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
       }
     });
 
-    return res.status(200).json({ message: 'Snippet updated successfully', snippet: updatedSnippet, success : true , isSubscribed : subscription.isSubscribed });
+    return res.status(200).json({ message: 'Snippet updated successfully', snippet: updatedSnippet, success: true, isSubscribed: subscription.isSubscribed });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ "error": "Internal server error" });
