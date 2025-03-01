@@ -22,13 +22,12 @@ router.get('/easter', (req, res) => {
 router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) => {
   const { title, content, description, tags, favorite, language, isPrivate } = req.body;
   const userId = req.user.userId;
-  console.log("checking details");
+
   if (!title || !content || !description) {
     return res.status(400).json({ "error": "Title, content, and description are required" });
   }
 
   try {
-    console.log("checking subs")
     const subscription = await prisma.user.findUnique({
       where: { id: userId }
     });
@@ -39,7 +38,6 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
       });
 
       if (snippetCount >= 100) {
-        console.log("inside count")
         return res.status(403).json({ "error": "Snippet limit reached. You can only create up to 100 snippets." });
       }
     }
