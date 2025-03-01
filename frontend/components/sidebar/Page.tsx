@@ -9,12 +9,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faGithub, faLinkedinIn, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { Button } from '../ui/button';
+import { buttonVariants } from "@/components/ui/button";
 import axios from 'axios';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
 import { usePathname } from 'next/navigation';
-
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const languages = [
   "JavaScript", "TypeScript", "Java", "Python", "C", "C++",
@@ -28,8 +35,11 @@ declare global {
   }
 }
 
+interface SidebarProps {
+  isCollapsed: boolean
+}
 
-export const Sidebar = () => {
+export const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const pathname = usePathname();
   const { toast } = useToast()
   const [responseId, setResponseId] = useState("");
@@ -53,7 +63,7 @@ export const Sidebar = () => {
       currency: "INR"
     });
 
-    const config = {  
+    const config = {
       method: "post",
       maxBodyLength: Infinity,
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/payments/orders`,
@@ -154,85 +164,191 @@ export const Sidebar = () => {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col justify-between text-white/90">
+    <div 
+      data-collapsed={isCollapsed}
+      className="w-full h-screen flex flex-col justify-between text-white/90 group border-r border-neutral-800"
+    >
       <div className='flex flex-col'>
-        <div className="flex flex-row gap-3 items-center justify-start py-4 px-6 cursor-pointer">
-          <Code />
-          <Link href={'/dashboard'} className="font-bold text-xl">Syntax Snipp</Link>
+        <div className={cn(
+          "flex items-center py-4 px-6 cursor-pointer",
+          isCollapsed ? "justify-center" : "flex-row gap-3"
+        )}>
+          <Code className="h-5 w-5 my-1" />
+          {!isCollapsed && (
+            <Link href={'/dashboard'} className="font-bold text-xl">Syntax Snipp</Link>
+          )}
         </div>
         <Separator className="bg-slate-400/20" />
-        <div className="flex my-4 flex-col gap-2 px-6">
-          <Link
-            href="/dashboard"
-            className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/dashboard" ? "bg-[#272729] text-white" : "text-white/90"
-              }`}
-          >
-            <LayoutDashboard className="h-5 w-5" />
-            <h1>Dashboard</h1>
-          </Link>
-          <Link
-            href="/createsnippet"
-            className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/createsnippet" ? "bg-[#272729] text-white" : "text-white/90"
-            }`}
-          >
-            <MessageSquareDiff className="h-5 w-5" />
-            <h1>Create Snippet</h1>
-          </Link>
-          <Link
-            href="/profile"
-            className={`gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ${pathname === "/profile" ? "bg-[#272729] text-white" : "text-white/90"
-            }`}
-          >
-            <SquareUser className="h-5 w-5" />
-            <h1>Profile</h1>
-          </Link>
-          <div
-            onClick={handleLogoutClick}
-            className="gap-3 flex flex-row justify-start items-center text-lg rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer"
-          >
-            <LogOut className="h-5 w-5" />
-            <h1>Logout</h1>
-          </div>
-        </div>
-        <Separator className="bg-slate-400/20" />
-        <div className="my-8 flex flex-col gap-3">
-          <h1 className="px-6 text-lg font-semibold flex flex-row items-center gap-2 "><Bookmark className='h-5 w-6' /> Popular Tags</h1>
-          <div className="flex flex-wrap px-8 gap-3">
-            {languages.map((language) => (
-              <Badge
-                key={language}
-                variant="secondary"
-                className="bg-[#272729] text-white/90 hover:text-black rounded-xl text-sm font-normal cursor-pointer"
+        
+        <nav className="grid px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2 mt-4 gap-4">
+          {isCollapsed ? (
+            <>
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/dashboard"
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "h-9 w-9",
+                        pathname === "/dashboard" && "bg-[#272729] text-white"
+                      )}
+                    >
+                      <LayoutDashboard className="h-5 w-5" />
+                      <span className="sr-only">Dashboard</span>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Dashboard</TooltipContent>
+                </Tooltip>
+
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/createsnippet"
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "h-9 w-9",
+                        pathname === "/createsnippet" && "bg-[#272729] text-white"
+                      )}
+                    >
+                      <MessageSquareDiff className="h-5 w-5" />
+                      <span className="sr-only">Create Snippet</span>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Create Snippet</TooltipContent>
+                </Tooltip>
+
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/profile"
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "h-9 w-9",
+                        pathname === "/profile" && "bg-[#272729] text-white"
+                      )}
+                    >
+                      <SquareUser className="h-5 w-5" />
+                      <span className="sr-only">Profile</span>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Profile</TooltipContent>
+                </Tooltip>
+
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={handleLogoutClick}
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "h-9 w-9"
+                      )}
+                    >
+                      <LogOut className="h-5 w-5" />
+                      <span className="sr-only">Logout</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Logout</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Link
+                href="/dashboard"
+                className={cn(
+                  "gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer",
+                  pathname === "/dashboard" && "bg-[#272729] text-white"
+                )}
               >
-                {language}
-              </Badge>
-            ))}
+                <LayoutDashboard className="h-5 w-5" />
+                <span>Dashboard</span>
+              </Link>
+
+              <Link
+                href="/createsnippet"
+                className={cn(
+                  "gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer",
+                  pathname === "/createsnippet" && "bg-[#272729] text-white"
+                )}
+              >
+                <MessageSquareDiff className="h-5 w-5" />
+                <span>Create Snippet</span>
+              </Link>
+
+              <Link
+                href="/profile"
+                className={cn(
+                  "gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer",
+                  pathname === "/profile" && "bg-[#272729] text-white"
+                )}
+              >
+                <SquareUser className="h-5 w-5" />
+                <span>Profile</span>
+              </Link>
+
+              <button
+                onClick={handleLogoutClick}
+                className="gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer"
+              >
+                <LogOut className="h-5 w-5" />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+        </nav>
+
+        {!isCollapsed && (
+          <div className='flex flex-col w-full justify-center items-center'>
+            <Separator className="bg-slate-400/20" />
+            <div className="my-8 flex flex-col gap-3">
+              <h1 className="px-6 text-lg font-semibold flex flex-row items-center gap-2">
+                <Bookmark className='h-5 w-6' /> Popular Tags
+              </h1>
+              <div className="flex flex-wrap px-8 gap-3">
+                {languages.map((language) => (
+                  <Badge
+                    key={language}
+                    variant="secondary"
+                    className="bg-[#272729] text-white/90 hover:text-black rounded-xl text-sm font-normal cursor-pointer"
+                  >
+                    {language}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <Separator className="bg-slate-400/20" />
+          </div>
+        )}
+
+        {!isCollapsed && (
+          <div className='my-6 flex flex-col px-4 items-end'>
+            <div className='border border-slate-400/20 rounded-lg p-4'>
+              <h1 className='text-xl font-bold'>Upgrade to Pro</h1>
+              <h3 className='text-sm py-3'>Unlock unlimited snippets with advanced organization support!</h3>
+              <Button className='bg-[#272729]' onClick={handleUpgradeClick}>Checkout features</Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {!isCollapsed && (
+        <div className='mt-auto'>
+          <Separator className="bg-slate-400/20" />
+          <div className='flex flex-row justify-evenly px-16 gap-4 py-2'>
+            <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faEnvelope} />
+            <Link href={'https://www.linkedin.com/in/dishantmiyani/'} target='_blank'>
+              <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faLinkedinIn} />
+            </Link>
+            <Link href={'https://github.com/dishant1804/'} target='_blank'>
+              <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faGithub} />
+            </Link>
+            <Link href={'https://x.com/MiyaniDishant'} target='_blank'>
+              <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faXTwitter} />
+            </Link>
           </div>
         </div>
-        <Separator className="bg-slate-400/20" />
-        <div className='my-6 flex flex-col px-4'>
-          <div className='border border-slate-400/20 rounded-lg p-4'>
-            <h1 className='text-xl font-bold'>Upgrade to Pro</h1>
-            <h3 className='text-sm py-3'>Unlock unlimited snippets with advanced organization support!</h3>
-            <Button className='bg-[#272729]' onClick={handleUpgradeClick}>Checkout features</Button>
-          </div>
-        </div>
-      </div>
-      <div className='mt-auto'>
-        <Separator className="bg-slate-400/20" />
-        <div className='flex flex-row justify-evenly px-16 gap-4 py-2'>
-          <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faEnvelope} />
-          <Link href={'https://www.linkedin.com/in/dishantmiyani/'} target='_blank' >
-            <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faLinkedinIn} />
-          </Link>
-          <Link href={'https://github.com/dishant1804/'} target='_blank'>
-            <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faGithub} />
-          </Link>
-          <Link href={'https://x.com/MiyaniDishant'} target='_blank' >
-            <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faXTwitter} />
-          </Link>
-        </div>
-      </div>
+      )}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className='bg-[#1a1a1a] border-none text-white/90 w-full max-w-xl'>
           <DialogHeader>

@@ -34,7 +34,7 @@ const NavbarComponent = ({ isShareSnippet }: { isShareSnippet: boolean }) => {
           <ul className="gap-4 lg:gap-6 hidden md:flex items-center font-semibold">
             {!isShareSnippet && <>
               <Link href={''} className="hover:underline cursor-pointer">Features</Link >
-              <Link href={''} className="hidden lg:flex hover:underline cursor-pointer">Pricing</Link >
+              <Link href={'/pricing'} className="hidden lg:flex hover:underline cursor-pointer">Pricing</Link >
               <Link href={'/docs'} className="hover:underline cursor-pointer">Docs</Link >
             </>}
             <Button onClick={handleSigninClick} className="border hover:bg-[#111111] border-slate-400/50 px-4 py-2 rounded-xl">Log In</Button>

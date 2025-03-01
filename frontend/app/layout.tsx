@@ -25,10 +25,10 @@ export default function RootLayout({
         className={`${spaceMono.variable} antialiased`}
       >
         <Provider store={store}>
-          <AuthCheck>
+          {/* <AuthCheck> */}
             {children}
             <Toaster />
-          </AuthCheck>
+          {/* </AuthCheck> */}
         </Provider>
       </body>
     </html>

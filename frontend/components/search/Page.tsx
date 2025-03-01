@@ -103,10 +103,10 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
 
   return (
     <div className="flex flex-col h-full text-white/90">
-      <div className="flex flex-row justify-between px-10 py-3 text-white/90">
-        <h1 className="text-xl font-bold">Search Snippets</h1>
+      <div className="flex flex-row items-center justify-center px-4 py-3 text-white/90">
+        {/* <h1 className="xl:text-xl hidden xl:flex font-bold lg:pl-6">Search Snippets</h1> */}
         <Tabs value={activeTabInternal} onValueChange={handleTabChange} className="w-auto items-center justify-center flex">
-          <TabsList className="flex flex-row gap-2 bg-[#272729]">
+          <TabsList className="flex flex-row gap-1 py-1.5 bg-[#272729]">
             <TabsTrigger value="allsnippets" className="text-xs text-white/60 bg-[#1a1a1a]">All Snippets</TabsTrigger>
             <TabsTrigger value="mysnippets" className="text-xs text-white/60 bg-[#1a1a1a]">My Snippets</TabsTrigger>
             <TabsTrigger value="favorites" className="text-xs text-white/60 bg-[#1a1a1a]">Favorites</TabsTrigger>

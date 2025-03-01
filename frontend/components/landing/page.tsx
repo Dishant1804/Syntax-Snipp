@@ -16,9 +16,6 @@ export default function LandingPage() {
         <BrowserMockupComponent />
         <Features />
         <PricingComponent />
-        <div className="w-full flex flex-row text-neutral-400 justify-center items-center py-4">
-          Made with&nbsp;<FontAwesomeIcon icon={faHeart} />&nbsp;by&nbsp;<Link href={'https://github.com/Dishant1804'} target="_blank" className="hover:underline">Dishant</Link>
-        </div>
       </div>
     </div>
   );
