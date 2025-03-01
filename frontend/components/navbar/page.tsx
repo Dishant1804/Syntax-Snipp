@@ -33,9 +33,10 @@ const NavbarComponent = ({ isShareSnippet }: { isShareSnippet: boolean }) => {
           </div>
           <ul className="gap-4 lg:gap-6 hidden md:flex items-center font-semibold">
             {!isShareSnippet && <>
-              <Link href={''} className="hover:underline cursor-pointer">Features</Link >
+              {/* <Link href={''} className="hover:underline cursor-pointer">Features</Link > */}
               <Link href={'/pricing'} className="hidden lg:flex hover:underline cursor-pointer">Pricing</Link >
-              <Link href={'/docs'} className="hover:underline cursor-pointer">Docs</Link >
+              {/* <Link href={'/docs'} className="hover:underline cursor-pointer">Docs</Link > */}
+              <Link target="_blank" href={'https://marketplace.visualstudio.com/items?itemName=DishantMiyani.syntax-snipp'} className="hidden lg:flex hover:underline cursor-pointer">VsCode-Extension</Link >
             </>}
             <Button onClick={handleSigninClick} className="border hover:bg-[#111111] border-slate-400/50 px-4 py-2 rounded-xl">Log In</Button>
             <Button onClick={handleSignupClick} className="bg-white/90 hover:bg-white/80 text-[#111111] px-4 py-2 rounded-xl">Sign Up</Button>
