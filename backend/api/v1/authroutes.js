@@ -173,7 +173,7 @@ router.post("/signin", rateLimiter, async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
-      // secure : true,
+      secure : true,
     });
     return res.json({ status: "signedin", success: true });
   } catch (e) {
@@ -423,20 +423,20 @@ router.get('/github/callback', passport.authenticate('github', {
       await prisma.session.create({
         data: {
           userId: user.id,
-          token,
+          token : newToken,
         },
       });
 
       res.cookie("token", newToken, {
         httpOnly: true,
         sameSite: "lax",
-        // secure : true,
+        secure : true,
       });
 
       res.cookie("githubToken", token, {
         httpOnly: true,
         sameSite: "lax",
-        // secure : true,
+        secure : true,
       });
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (error) {
@@ -563,7 +563,7 @@ router.post("/logout", authMiddleware, async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       sameSite: "lax",
-      // secure : true
+      secure : true
     });
 
     res.json({ message: "Logged out successfully", success: true });
