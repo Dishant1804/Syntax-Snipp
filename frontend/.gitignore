@@ -15,6 +15,7 @@
 
 # production
 /build
+pnpm-workspace.yaml
 
 # misc
 .DS_Store
