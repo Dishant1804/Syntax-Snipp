@@ -67,12 +67,12 @@ export const MonacoEditorDisplaySnippetComponent = ({ content, language }: Snipp
           <div className='bg-yellow-500 h-3 w-3 rounded-full'></div>
           <div className='bg-green-500 h-3 w-3 rounded-full'></div>
         </div>
-        <div className='flex items-center font-mono justify-center w-full text-white/90'>
+        <div className='flex text-sm items-center font-mono justify-center w-full text-white/90'>
           ~/Syntax-snipp/displaySnippet
         </div>
       </div>
       <div className='h-auto flex justify-between items-center w-full px-10 font-mono text-md mb-3 text-[#aeafb2]'>
-        <div className='border px-2 py-1 border-slate-400/20 rounded-lg'>
+        <div className='border text-sm px-2 py-1 border-slate-400/20 rounded-lg'>
           {language}
         </div>
         <TooltipProvider>

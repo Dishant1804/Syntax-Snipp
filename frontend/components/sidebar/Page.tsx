@@ -5,9 +5,6 @@ import { Code, LayoutDashboard, MessageSquareDiff, SquareUser, Bookmark, Check, 
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
-import { faGithub, faLinkedinIn, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { Button } from '../ui/button';
 import { buttonVariants } from "@/components/ui/button";
 import axios from 'axios';
@@ -91,7 +88,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
     }
 
     const options = {
-      key: 'rzp_test_fOkl8NGPmGodzi',
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: amount,
       currency: 'INR',
       name: "Syntax Snipp",
@@ -147,7 +144,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
 
   const handleAvailNowClick = () => {
     setIsDialogOpen(false);
-    createRazorpayOrder(335);
+    createRazorpayOrder(1);
   };
 
   const handleLogoutClick = () => {
@@ -257,7 +254,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
               <Link
                 href="/dashboard"
                 className={cn(
-                  "gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer",
+                  "gap-3 flex flex-row justify-start items-center text-md rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer",
                   pathname === "/dashboard" && "bg-[#272729] text-white"
                 )}
               >
@@ -268,7 +265,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
               <Link
                 href="/createsnippet"
                 className={cn(
-                  "gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer",
+                  "gap-3 flex flex-row justify-start items-center text-md rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ",
                   pathname === "/createsnippet" && "bg-[#272729] text-white"
                 )}
               >
@@ -279,7 +276,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
               <Link
                 href="/profile"
                 className={cn(
-                  "gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer",
+                  "gap-3 flex flex-row justify-start items-center text-md rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer ",
                   pathname === "/profile" && "bg-[#272729] text-white"
                 )}
               >
@@ -289,7 +286,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
 
               <button
                 onClick={handleLogoutClick}
-                className="gap-3 flex flex-row justify-start items-center text-sm rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer"
+                className="gap-3 flex flex-row justify-start items-center text-md rounded-lg py-2 px-6 hover:bg-[#272729] transition ease-in duration-100 cursor-pointer "
               >
                 <LogOut className="h-5 w-5" />
                 <span>Logout</span>
@@ -332,23 +329,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
         )}
       </div>
 
-      {!isCollapsed && (
-        <div className='mt-auto'>
-          <Separator className="bg-slate-400/20" />
-          <div className='flex flex-row justify-evenly px-16 gap-4 py-2'>
-            <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faEnvelope} />
-            <Link href={'https://www.linkedin.com/in/dishantmiyani/'} target='_blank'>
-              <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faLinkedinIn} />
-            </Link>
-            <Link href={'https://github.com/dishant1804/'} target='_blank'>
-              <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faGithub} />
-            </Link>
-            <Link href={'https://x.com/MiyaniDishant'} target='_blank'>
-              <FontAwesomeIcon className='h-6 w-6 p-2 border border-slate-400/20 rounded-lg cursor-pointer hover:bg-[#272729] transition-colors' icon={faXTwitter} />
-            </Link>
-          </div>
-        </div>
-      )}
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className='bg-[#1a1a1a] border-none text-white/90 w-full max-w-xl'>
           <DialogHeader>

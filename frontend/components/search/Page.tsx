@@ -137,7 +137,7 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
             <div>No snippets found</div>
           ) : (
             filteredSnippets.length > 0 ? (
-              filteredSnippets.map((snippet) => (
+              filteredSnippets.map((snippet : Snippet) => (
                 <div
                   key={snippet.id}
                   className={`h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 transition ease-in-out duration-100 cursor-pointer ${selectedSnippetId === snippet.id

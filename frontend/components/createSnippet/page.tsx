@@ -48,7 +48,7 @@ const CreateSnippetComponent = () => {
           <div className='flex flex-col justify-center w-full items-center'>
             <div className='w-[75%] flex flex-col'>
               <div className='gap-2 flex flex-col'>
-                <Label className='text-xl flex items-start'>Title</Label>
+                <Label className='text-lg flex items-start'>Title</Label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -57,7 +57,7 @@ const CreateSnippetComponent = () => {
                 />
               </div>
               <div className='gap-2 flex flex-col mt-4'>
-                <Label className='text-xl flex items-start'>Description</Label>
+                <Label className='text-lg flex items-start'>Description</Label>
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -66,7 +66,7 @@ const CreateSnippetComponent = () => {
                 />
               </div>
               <div className='flex flex-col mt-4'>
-                <Label className='text-xl flex items-start'>Tags</Label>
+                <Label className='text-lg flex items-start'>Tags</Label>
                 <div className='flex flex-wrap gap-2 mt-2'>
                   {tags.map((tag) => (
                     <div key={tag} className='flex items-center bg-[#272729] text-white p-4 py-1 rounded-full'>
@@ -91,7 +91,7 @@ const CreateSnippetComponent = () => {
                 </div>
               </div>
               <div className='flex flex-col mt-4'>
-                <Label className='text-xl flex items-start'>Snippet</Label>
+                <Label className='text-lg flex items-start'>Snippet</Label>
                 <MonacoEditorCreateSnippetComponent title={title} description={description} tags={tags}/>
               </div>
             </div>

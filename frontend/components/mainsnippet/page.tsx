@@ -22,7 +22,7 @@ interface UserProfile {
   email: string;
 }
 
-export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" | "favorites"}) => {
+export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" | "favorites" }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const snippet = useSelector((state: RootState) => state.snippet.selectedSnippet);
   const [isFavorite, setIsFavorite] = useState<boolean>(snippet?.favorite || false);
@@ -134,6 +134,10 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
     router.push(`/editsnippet/${id}`)
   }
 
+  const handleMouseclickAvatar = () => {
+    router.push('/profile')
+  }
+
   return (
     <div className="text-white/90 flex flex-col">
       {loading ? (
@@ -175,15 +179,18 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
                 </>
               )}
             </div>
-            <div className="pr-4">
+            <div >
               <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                   <Avatar
                     className="cursor-pointer"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
+                    onClick={handleMouseclickAvatar}
                   >
-                    <AvatarImage src='https://github.com/shadcn.png' alt="User avatar" />
+                    <AvatarFallback>
+                      {profile?.username ? profile.username.charAt(0).toUpperCase() : ''}
+                    </AvatarFallback>
                   </Avatar>
                 </PopoverTrigger>
                 <PopoverContent
@@ -213,7 +220,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
             </Avatar>
             <div className='w-full'>
               <div className="flex flex-row w-full items-center justify-between">
-                <div className='font-bold text-xl flex'>{snippet.user.username}</div>
+                <div className='font-bold text-lg flex'>{snippet.user.username}</div>
                 <div className='flex flex-row gap-3 items-center'>
                   {activeTab === 'mysnippets' && (
                     snippet.isPrivate ? (
@@ -237,13 +244,13 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
                     )
                   )}
                   {snippet.updatedAt && new Date(snippet.updatedAt) > new Date(snippet.createdAt) ? (
-                    <h1 className='flex text-neutral-400'>Updated at: {formatDate(snippet.updatedAt)}</h1>
+                    <h1 className='flex text-sm text-neutral-400'>Updated at: {formatDate(snippet.updatedAt)}</h1>
                   ) : (
-                    <h1 className='flex text-neutral-400'>Created at: {formatDate(snippet.createdAt)}</h1>
+                    <h1 className='flex text-sm text-neutral-400'>Created at: {formatDate(snippet.createdAt)}</h1>
                   )}
                 </div>
               </div>
-              <p className="text-lg mt-1">{snippet.title}</p>
+              <p className="text-md mt-1">{snippet.title}</p>
               <p className="text-sm mt-1">
                 {snippet.description
                   ? truncateDescription(snippet.description, 30)
@@ -253,16 +260,16 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab}: { setIsS
           </div>
           <Separator className="bg-slate-400/20" />
           <div className='w-full flex flex-row justify-center px-4 py-3'>
-            <div className='w-full flex flex-row bg-[#1a1a1a] items-center rounded-md overflow-hidden'>
-              <div className='flex-grow flex items-center px-3 py-2'>
+            <div className='w-full flex flex-row bg-[#1a1a1a] items-center rounded-md overflow-hidden relative'>
+              <div className='w-full flex items-center px-3 py-2'>
                 <Link className='h-4 w-4 mr-2 text-white' />
-                <h1 className='text-white truncate'>{url}</h1>
+                <h1 className='text-white truncate text-sm pr-10'>{url}</h1>
               </div>
               <Button
                 onClick={handleCopy}
                 variant="ghost"
                 size="icon"
-                className='h-full aspect-square bg-neutral-700 hover:bg-neutral-700 rounded-none'
+                className='absolute right-0 h-full aspect-square bg-neutral-700 hover:bg-neutral-700 rounded-none'
               >
                 {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-white" />}
               </Button>
