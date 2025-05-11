@@ -29,7 +29,7 @@ const NavbarComponent = ({ isShareSnippet }: { isShareSnippet: boolean }) => {
         <div className="w-full md:max-w-7xl flex flex-row md:justify-between items-center py-3 px-3 md:px-6 mx-3 my-2 rounded-xl gap-2 border border-slate-400/20 backdrop-blur-sm bg-[#111111]/20">
           <div className="font-semibold flex flex-row flex-nowrap gap-2 items-center">
             <Code2Icon className="flex h-5 w-5 md:h-6 md:w-6" />
-            <Link href='/' className="text-xl md:text-2xl cursor-pointer">Syntax-snipp</Link>
+            <Link href='/' className="text-xl text-neutral-300 md:text-2xl cursor-pointer">Syntax-snipp</Link>
           </div>
           <ul className="gap-4 lg:gap-6 hidden md:flex items-center font-semibold">
             {!isShareSnippet && <>
@@ -46,4 +46,4 @@ const NavbarComponent = ({ isShareSnippet }: { isShareSnippet: boolean }) => {
   </>);
 }
 
-  export default NavbarComponent;
+export default NavbarComponent;

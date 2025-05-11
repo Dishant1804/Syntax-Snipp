@@ -3,9 +3,8 @@ import HeroSectionComponent from "../herosection/page";
 import BrowserMockupComponent from "../browsermockup/page";
 import Features from "../features/page";
 import PricingComponent from "../pricing/page";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import FooterComponent from "../footer/page";
+import PitchComponent from "../pitch/page";
 
 export default function LandingPage() {
   return (
@@ -15,7 +14,9 @@ export default function LandingPage() {
         <HeroSectionComponent />
         <BrowserMockupComponent />
         <Features />
+        <PitchComponent />
         <PricingComponent />
+        <FooterComponent />
       </div>
     </div>
   );

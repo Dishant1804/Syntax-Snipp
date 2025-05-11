@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SpinnerWithText } from '../components/ui/spinnerWithText';
 
 
-const publicRoutes = ['/', '/login', '/signup', '/signin', '/sharesnippet' , '/docs' , '/signin/vscode' , '/google/vscode/callback' , '/http://localhost:54321/auth/'];
+const publicRoutes = ['/', '/login', '/signup', '/signin', '/pricing', '/sharesnippet', '/docs', '/signin/vscode', '/google/vscode/callback', '/http://localhost:54321/auth/'];
 
 const AuthCheck = ({ children }: any) => {
   const router = useRouter();
@@ -31,19 +31,19 @@ const AuthCheck = ({ children }: any) => {
           toast({
             title: "Session Expired",
             description: "Please login again!",
-            duration : 5000,
+            duration: 5000,
           });
           router.push('/');
         }
-      } 
+      }
       catch (error) {
         toast({
           title: "Something went wrong",
           description: "Please login again!",
-          duration : 5000
+          duration: 5000
         });
         router.push('/');
-      } 
+      }
       finally {
         setLoading(false);
       }
