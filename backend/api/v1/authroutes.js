@@ -301,8 +301,6 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
         },
       });
 
-      console.log(user);
-
       const existingSessions = await prisma.session.findMany({
         where: { userId: user.id, isValid: true },
       });
@@ -522,7 +520,7 @@ router.patch('/updateprofile', rateLimiter, authMiddleware, async (req, res) => 
 },
 );
 
-router.get("/user/profile", authMiddleware, async (req, res) => {
+router.get("/user/profile", rateLimit, authMiddleware, async (req, res) => {
   const userId = req.user.userId;
 
   try {
