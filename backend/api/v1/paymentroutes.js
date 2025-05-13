@@ -100,58 +100,46 @@ router.post("/activate-subscription", authMiddleware, async (req, res) => {
 
     res.status(201).json({
       message: 'Subscription activated successfully',
-      "success" : true,
+      "success": true,
       ...result,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to activate subscription' , "success" : false });
+    res.status(500).json({ error: 'Failed to activate subscription', "success": false });
   }
 });
 
 //setup a cron job for this
 router.post('/update-subscriptions', async (req, res) => {
+  const secret = req.headers['x-cron-secret'];
+  if (secret !== process.env.CRON_SECRET) {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
+
   try {
-
     await prisma.$transaction(async (prisma) => {
-
       const activeSubscriptions = await prisma.subscription.findMany({
-        where: {
-          user: {
-            isSubscribed: true
-          }
-        },
-        include: {
-          user: true
-        }
+        where: { user: { isSubscribed: true } },
+        include: { user: true },
       });
 
       await Promise.all(
         activeSubscriptions.map(async (sub) => {
           if (sub.daysWithService > 0) {
-            
             await prisma.subscription.update({
               where: { id: sub.id },
-              data: {
-                daysWithService: sub.daysWithService - 1,
-              },
+              data: { daysWithService: sub.daysWithService - 1 },
             });
           }
 
           if (sub.daysWithService <= 1) {
-            
             await prisma.user.update({
               where: { id: sub.userId },
-              data: {
-                isSubscribed: false,
-              },
+              data: { isSubscribed: false },
             });
-
             await prisma.subscription.update({
               where: { id: sub.id },
-              data: {
-                daysWithService: 0,
-              },
+              data: { daysWithService: 0 },
             });
           }
         })
@@ -164,5 +152,6 @@ router.post('/update-subscriptions', async (req, res) => {
     res.status(500).json({ message: 'Failed to update subscriptions' });
   }
 });
+
 
 export default router;

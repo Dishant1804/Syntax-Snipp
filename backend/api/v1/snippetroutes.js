@@ -37,8 +37,18 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
         where: { userId }
       });
 
-      if (snippetCount >= 100) {
-        return res.status(403).json({ "error": "Snippet limit reached. You can only create up to 100 snippets." });
+      if (snippetCount >= 10) {
+        return res.status(403).json({ "error": "Snippet limit reached. You can only create up to 10 snippets." });
+      }
+    }
+
+    if (subscription && subscription.isSubscribed) {
+      const snippetCount = await prisma.snippet.count({
+        where: { id: userId }
+      })
+
+      if (snippetCount >= 150) {
+        return res.status(403).json({ "error": "Snippet limit reached. You can only create up to 150 snippets." });
       }
     }
 
@@ -137,6 +147,7 @@ router.get('/displaysnippet/:id', authMiddleware, SnippetLimiter, async (req, re
           select: {
             username: true,
             email: true,
+            profileImage: true,
           }
         },
         tags: {
@@ -185,6 +196,7 @@ router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, re
           select: {
             username: true,
             email: true,
+            profileImage: true,
           }
         },
         tags: {
@@ -237,6 +249,7 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
           select: {
             username: true,
             email: true,
+            profileImage: true,
           }
         },
         tags: {
@@ -444,6 +457,7 @@ router.get('/favoritesnippets', authMiddleware, SnippetLimiter, async (req, res)
           select: {
             username: true,
             email: true,
+            profileImage: true,
           }
         },
         tags: {

@@ -13,6 +13,7 @@ model User {
   email        String        @unique
   passwordHash String?
   accessToken  String?
+  profileImage String?
   isGoogle     Boolean       @default(false)
   isGithub     Boolean       @default(false)
   payments     Payments[]
@@ -25,11 +26,11 @@ model User {
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  userId       String
-  token        String   @unique
-  isValid      Boolean  @default(true)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String  @id @default(uuid())
+  userId  String
+  token   String  @unique
+  isValid Boolean @default(true)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([token])

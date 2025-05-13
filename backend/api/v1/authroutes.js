@@ -173,7 +173,7 @@ router.post("/signin", rateLimiter, async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
-      secure : true,
+      secure: true,
     });
     return res.json({ status: "signedin", success: true });
   } catch (e) {
@@ -241,7 +241,7 @@ router.post("/signin-vscode", rateLimiter, async (req, res) => {
 
     const subscription = await prisma.user.findUnique({
       where: {
-        email : req.body.email,
+        email: req.body.email,
       },
       select: {
         isSubscribed: true,
@@ -249,7 +249,7 @@ router.post("/signin-vscode", rateLimiter, async (req, res) => {
     })
 
     const authUrl = `http://localhost:54321/auth/${token}/${user.isSubscribed}`;
-    
+
     res.json({
       success: true,
       redirectUrl: authUrl,
@@ -291,13 +291,17 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
         },
         update: {
           isGoogle: true,
+          profileImage: profile.photos[0].value,
         },
         create: {
           username: profile.displayName,
           email: profile.emails[0].value,
           isGoogle: true,
+          profileImage: profile.photos[0].value,
         },
       });
+
+      console.log(user);
 
       const existingSessions = await prisma.session.findMany({
         where: { userId: user.id, isValid: true },
@@ -387,9 +391,7 @@ router.get('/github/callback', passport.authenticate('github', {
     try {
       const { profile, token } = req.user;
       const hashedToken = await hash(token, saltRounds);
-
-      const email =
-        profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+      const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
 
       let user = await prisma.user.findUnique({
         where: {
@@ -402,6 +404,7 @@ router.get('/github/callback', passport.authenticate('github', {
           data: {
             username: profile.username.toLowerCase(),
             email: email,
+            profileImage: profile._json.avatar_url,
             passwordHash: hashedToken,
             isGithub: true,
           },
@@ -423,20 +426,20 @@ router.get('/github/callback', passport.authenticate('github', {
       await prisma.session.create({
         data: {
           userId: user.id,
-          token : newToken,
+          token: newToken,
         },
       });
 
       res.cookie("token", newToken, {
         httpOnly: true,
         sameSite: "lax",
-        secure : true,
+        secure: true,
       });
 
       res.cookie("githubToken", token, {
         httpOnly: true,
         sameSite: "lax",
-        secure : true,
+        secure: true,
       });
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (error) {
@@ -533,6 +536,7 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
         isGoogle: true,
         isGithub: true,
         createdAt: true,
+        profileImage: true,
         updatedAt: true,
         isSubscribed: true,
       },
@@ -563,7 +567,7 @@ router.post("/logout", authMiddleware, async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       sameSite: "lax",
-      secure : true
+      secure: true
     });
 
     res.json({ message: "Logged out successfully", success: true });

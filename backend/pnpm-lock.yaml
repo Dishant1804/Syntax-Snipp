@@ -11,6 +11,9 @@ importers:
       '@prisma/client':
         specifier: 6.6.0
         version: 6.6.0(prisma@6.6.0)
+      axios:
+        specifier: ^1.9.0
+        version: 1.9.0
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -38,6 +41,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
+      node-cron:
+        specifier: ^4.0.3
+        version: 4.0.3
       nodemon:
         specifier: ^3.1.9
         version: 3.1.9
@@ -351,8 +357,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.8.4:
-    resolution: {integrity: sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==}
+  axios@1.9.0:
+    resolution: {integrity: sha512-re4CqKTJaURpzbLHtIi6XpDv20/CnpXOtjRY5/CU32L8gU8ek9UIivcfvSWvmKEngmVbrUtPpdDwWDWL7DNHvg==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -785,6 +791,10 @@ packages:
 
   node-addon-api@5.1.0:
     resolution: {integrity: sha512-eh0GgfEkpnoWDq+VY8OyvYhFEzBk6jIYbRKdIlyTiAXIVJ8PyBaKb0rp7oDtoddbdoHWhq8wwr+XZ81F1rpNdA==}
+
+  node-cron@4.0.3:
+    resolution: {integrity: sha512-YPEUlbYGgpfN44OtCm4KkK4TXjeIB4arERbDWP7kJgM+QHFK9AdM6/3bp4M3oB1QBrL5INyTRLAPei87j49foA==}
+    engines: {node: '>=6.0.0'}
 
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
@@ -1290,7 +1300,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.8.4:
+  axios@1.9.0:
     dependencies:
       follow-redirects: 1.15.9
       form-data: 4.0.2
@@ -1762,6 +1772,8 @@ snapshots:
 
   node-addon-api@5.1.0: {}
 
+  node-cron@4.0.3: {}
+
   node-fetch@2.7.0:
     dependencies:
       whatwg-url: 5.0.0
@@ -1873,7 +1885,7 @@ snapshots:
 
   razorpay@2.9.6:
     dependencies:
-      axios: 1.8.4
+      axios: 1.9.0
     transitivePeerDependencies:
       - debug
 
