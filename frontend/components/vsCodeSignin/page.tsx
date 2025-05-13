@@ -50,12 +50,18 @@ const VsCodeSigninComponent = () => {
       if (response.data.success) {
         window.location.href = response.data.redirectUrl
       } else {
-        console.error('Authentication failed:', response.data.message);
+        //console.error('Authentication failed:', response.data.message);
+        toast({
+          title: "Authentication Failed",
+          description: "Invalid Credentials.",
+          variant: "destructive",
+          duration: 3000
+        });
       }
       setEmail("");
       setPassword("");
     } catch (error) {
-      console.error("Error during Signin:", error);
+      //console.error("Error during Signin:", error);
       toast({
         title: "Error while signing up",
         description: "Something went wrong try again after sometime",
@@ -82,7 +88,7 @@ const VsCodeSigninComponent = () => {
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
-            className="text-white"
+              className="text-white"
               id="email"
               type="email"
               placeholder="Enter your email"
@@ -102,7 +108,7 @@ const VsCodeSigninComponent = () => {
               </Link>
             </div>
             <Input
-            className="text-white"
+              className="text-white"
               id="password"
               type="password"
               placeholder="Enter your password"

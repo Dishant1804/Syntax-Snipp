@@ -9,6 +9,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LockKeyholeIcon } from 'lucide-react';
 import { editor } from 'monaco-editor';
+import { useToast } from "@/hooks/use-toast"
 
 type SnippetContents = {
   title: string,
@@ -25,6 +26,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
   const [dimensions, setDimensions] = useState({ width: '100%' });
   const [selectedLanguage, setSelectedLanguage] = useState('javascript');
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleEditorWillMount = (monaco: Monaco) => {
     monaco.editor.defineTheme('customTheme', customTheme);
@@ -45,7 +47,7 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
       }
     };
 
-    const fetchProfile = async() => {
+    const fetchProfile = async () => {
       const profileResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user/profile`, {
         withCredentials: true,
       });
@@ -82,12 +84,17 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/createsnippet`, data, {
         withCredentials: true,
       });
-      
+
       if (response.data.message === "Snippet created successfully") {
         router.push('/dashboard')
       }
     } catch (error) {
-      console.error('Error creating snippet:', error);
+      //console.error('Error creating snippet:', error);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   }
 

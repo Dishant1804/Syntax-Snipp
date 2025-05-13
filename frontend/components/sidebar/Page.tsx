@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState } from 'react';
-import { Code, LayoutDashboard, MessageSquareDiff, SquareUser, Bookmark, Check, LogOut } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { Code, LayoutDashboard, MessageSquareDiff, SquareUser, Bookmark, Check, LogOut, Flame } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
@@ -36,6 +36,13 @@ interface SidebarProps {
   isCollapsed: boolean
 }
 
+interface UserProfile {
+  name: string;
+  email: string;
+  profilePicture: string;
+  isSubscribed: boolean;
+}
+
 export const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const pathname = usePathname();
   const { toast } = useToast()
@@ -43,6 +50,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const router = useRouter()
+  const [profile, setProfile] = useState<UserProfile | null>(null);
 
   const loadScript = (src: string) => {
     return new Promise((resolve) => {
@@ -75,7 +83,13 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
         handleRazorpayScreen(response.data.amount);
       })
       .catch((error) => {
-        console.log("error at", error);
+        //console.log("error at", error);
+
+        toast({
+          title: "Something went wrong",
+          variant: "destructive",
+          duration: 3000
+        });
       });
   };
 
@@ -120,7 +134,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
             });
           }
         } catch (error) {
-          console.error("Subscription activation error:", error);
+          //console.error("Subscription activation error:", error);
           toast({
             title: "Activation Error",
             description: "There was an issue activating your subscription. Please try again or contact support.",
@@ -147,6 +161,31 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
     createRazorpayOrder(1);
   };
 
+  useEffect(() => {
+    fetchProfile();
+  }, [handleAvailNowClick]);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user/profile`, {
+        withCredentials: true,
+      });
+
+      if (response.data.success && response.data.status === "retrieved") {
+        setProfile(response.data.profile)
+      }
+    }
+    catch (e) {
+      //console.log(e);
+      //
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
+    }
+  }
+
   const handleLogoutClick = () => {
     setIsLogoutDialogOpen(true);
   };
@@ -161,7 +200,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
   };
 
   return (
-    <div 
+    <div
       data-collapsed={isCollapsed}
       className="w-full h-screen flex flex-col justify-between text-white/90 group border-r border-neutral-800"
     >
@@ -176,7 +215,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
           )}
         </div>
         <Separator className="bg-slate-400/20" />
-        
+
         <nav className="grid px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2 mt-4 gap-4">
           {isCollapsed ? (
             <>
@@ -230,6 +269,22 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right">Profile</TooltipContent>
+                </Tooltip>
+
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={handleUpgradeClick}
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "h-9 w-9"
+                      )}
+                    >
+                      <Flame className="h-5 w-5" />
+                      <span className="sr-only">Upgrade</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Upgrade to pro</TooltipContent>
                 </Tooltip>
 
                 <Tooltip delayDuration={0}>
@@ -307,7 +362,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   <Badge
                     key={language}
                     variant="secondary"
-                    className="bg-[#272729] text-white/90 hover:text-black rounded-xl text-sm font-normal cursor-pointer"
+                    className="bg-[#272729] text-white/90 hover:text-black rounded-xl text-sm font-normal cursor-default"
                   >
                     {language}
                   </Badge>
@@ -345,15 +400,15 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
           <div className="py-4">
             <h3 className="font-semibold mb-2">Pro Features:</h3>
             <ul className="space-y-1">
-              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Unlimited code snippets</li>
-              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Advanced organization tools</li>
+              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />150 code snippets</li>
               <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Priority support</li>
               <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Private snippets</li>
-              <li className='flex flex-row items-center gap-2'><Check className='h-4 w-4 text-green-400' />Collaboration features</li>
             </ul>
           </div>
           <div className="flex justify-center">
-            <Button onClick={handleAvailNowClick} className='bg-neutral-700 hover:bg-neutral-800'>Avail Now</Button>
+            {!profile?.isSubscribed ? (
+              <Button onClick={handleAvailNowClick} className='bg-neutral-700 hover:bg-neutral-800'>Avail Now</Button>
+            ) : <Button className='bg-neutral-800 hover:bg-neutral-800 cursor-default' >Already Subscribed!</Button>}
           </div>
         </DialogContent>
       </Dialog>

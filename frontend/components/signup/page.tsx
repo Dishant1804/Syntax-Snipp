@@ -103,7 +103,7 @@ export default function SignupComponent() {
       }
     }
     catch (error: any) {
-      console.error("Error during signup:", error)
+      //console.error("Error during signup:", error)
       toast({
         variant: "destructive",
         title: "Error while signing up",

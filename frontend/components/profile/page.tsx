@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from "@/hooks/use-toast";
 
 const ProfileComponent = ({ option }: { option: string }) => {
   const [username, setUsername] = useState<string>('');
@@ -13,6 +14,7 @@ const ProfileComponent = ({ option }: { option: string }) => {
   const [usernameError, setUsernameError] = useState<string>('');
   const [canUpdateUsername, setCanUpdateUsername] = useState<boolean>(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUsername = e.target.value;
@@ -45,7 +47,12 @@ const ProfileComponent = ({ option }: { option: string }) => {
       setCanUpdateUsername(daysSinceUpdate >= 30 || daysSinceCreation >= 30);
 
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      //console.error("Error fetching profile:", error);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   }
 
@@ -73,7 +80,7 @@ const ProfileComponent = ({ option }: { option: string }) => {
         router.push('/dashboard');
       }
     } catch (e) {
-      console.log(e);
+      //console.log(e);
       setUsernameError('An error occurred while updating your profile.');
     }
   }

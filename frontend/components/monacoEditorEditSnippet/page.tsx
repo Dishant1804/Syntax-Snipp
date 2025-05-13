@@ -9,6 +9,7 @@ import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { LockKeyholeIcon } from 'lucide-react';
 import { editor } from 'monaco-editor';
+import { useToast } from "@/hooks/use-toast";
 
 type SnippetContents = {
   title: string;
@@ -29,6 +30,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
   const [dimensions, setDimensions] = useState({ width: '100%' });
   const [selectedLanguage, setSelectedLanguage] = useState('javascript');
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleEditorWillMount = (monaco: Monaco) => {
     monaco.editor.defineTheme('customTheme', customTheme);
@@ -50,7 +52,7 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
       }
     };
 
-    const fetchProfile = async() => {
+    const fetchProfile = async () => {
       const profileResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user/profile`, {
         withCredentials: true,
       });
@@ -94,7 +96,14 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
         router.push('/dashboard');
       }
     } catch (error) {
-      console.error('Error saving snippet:', error);
+      //console.error('Error saving snippet:', error);
+      toast({
+        title: "Something went wrong",
+        description: "Please try again.",
+        variant: "destructive",
+        duration: 3000
+      });
+
     }
   };
 

@@ -6,6 +6,7 @@ import NavbarComponent from "../navbar/page";
 import { Badge } from "../ui/badge";
 import MonacoEditorShareSnippetComponent from '../monacoEditorShareSnippet/page';
 import { SpinnerWithText } from '../ui/spinnerWithText';
+import { useToast } from "@/hooks/use-toast";
 
 type Snippet = {
   id: string;
@@ -23,6 +24,7 @@ type Snippet = {
 const ShareSnippetComponent: React.FC = () => {
   const [snippet, setSnippet] = useState<Snippet | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const { toast } = useToast();
 
   const fetchSharedSnippet = async () => {
     try {
@@ -36,14 +38,22 @@ const ShareSnippetComponent: React.FC = () => {
           const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/sharesnippet/${id}`);
           setSnippet(response.data.snippet);
         } catch (error) {
-          console.error('Error fetching snippet:', error);
+          //console.error('Error fetching snippet:', error);
+          toast({
+            title: "Something went wrong",
+            variant: "destructive",
+            duration: 3000
+          });
+
         }
-      } else {
-        console.error('Invalid Url:', id);
       }
     }
     catch {
-
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
     }
     finally {
       setLoading(false);
@@ -57,7 +67,7 @@ const ShareSnippetComponent: React.FC = () => {
 
   return (
     <div className="w-screen bg-[#111111] text-white/90 h-screen flex flex-col items-center">
-      <NavbarComponent isShareSnippet={true}/>
+      <NavbarComponent isShareSnippet={true} />
       {loading ? <>
         <div className="flex justify-center items-center h-screen">
           <SpinnerWithText />

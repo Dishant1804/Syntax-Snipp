@@ -4,12 +4,13 @@ type Snippet = {
   id: string;
   title: string;
   description: string;
-  content : string;
+  content: string;
   language: string;
-  favorite : boolean;
+  favorite: boolean;
   user: {
     username: string;
-    email : string;
+    email: string;
+    profileImage: string;
   };
   tags: string[];
   createdAt: string;

@@ -10,6 +10,7 @@ import { X } from 'lucide-react';
 import { SpinnerWithText } from '@/components/ui/spinnerWithText';
 import axios from 'axios';
 import MonacoEditorEditSnippetComponent from '../monacoEditorEditSnippet/page';
+import { useToast } from "@/hooks/use-toast";
 
 const EditSnippetComponent = () => {
   // const [snippet, setSnippet] = useState<{ title?: string; description?: string; tags?: string[]; content?: string; isPrivate?: boolean }>({});
@@ -21,6 +22,7 @@ const EditSnippetComponent = () => {
   const [newTag, setNewTag] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [id, setId] = useState<string>('');
+  const { toast } = useToast();
 
   const addTag = () => {
     if (newTag.trim() !== '') {
@@ -57,7 +59,13 @@ const EditSnippetComponent = () => {
         setIsPrivate(response.data.snippet.isPrivate || false);
       }
     } catch (e) {
-      console.log(e);
+      //console.log(e);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
+
     } finally {
       setLoading(false);
     }

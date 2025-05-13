@@ -11,6 +11,7 @@ import { truncateTitle, truncateDescription } from "@/helpers/helper";
 import { useDispatch } from "react-redux";
 import { setSelectedSnippet } from "../../app/store/snippetSlice";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 
 type Snippet = {
   id: string;
@@ -18,10 +19,11 @@ type Snippet = {
   description: string;
   user: {
     username: string;
+    profileImage: string;
   };
   tags: string[];
-  createdAt : string;
-  updatedAt : string;
+  createdAt: string;
+  updatedAt: string;
   isPrivate: boolean;
 };
 
@@ -44,16 +46,16 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
     try {
       setLoading(true);
       setError(null);
-      let endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets` 
-      
-      if(activeTabInternal === "allsnippets"){
+      let endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets`
+
+      if (activeTabInternal === "allsnippets") {
         endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/displayallsnippets`
       }
-      if(activeTabInternal === "favorites"){
+      if (activeTabInternal === "favorites") {
         endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/favoritesnippets`
       }
-      if(activeTabInternal === "mysnippets"){
-        endpoint =  `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/mysnippets`;
+      if (activeTabInternal === "mysnippets") {
+        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/mysnippets`;
       }
 
       const response = await axios.get(endpoint, {
@@ -73,10 +75,10 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
         setSelectedSnippetId(fetchedSnippets[0].id);
       }
     } catch (e) {
-      console.error(e);
+      //console.error(e);
       setError("Failed to fetch snippets");
       setSnippets([]);
-    } 
+    }
     finally {
       setLoading(false);
     }
@@ -126,7 +128,7 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
         </div>
       </div>
       <ScrollArea className="flex-grow px-8 overflow-y-auto" type="always">
-        <div className="flex flex-col pb-1">
+        <div className="flex flex-col pb-1 w-full h-full">
           {loading ? (
             <div className="flex justify-center items-center h-screen">
               <SpinnerWithText />
@@ -134,23 +136,29 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
           ) : error ? (
             <div>{error}</div>
           ) : snippets.length === 0 ? (
-            <div>No snippets found</div>
+            <div className="w-full h-[300px] flex justify-center items-center"><h1>No snippets found</h1></div>
           ) : (
             filteredSnippets.length > 0 ? (
-              filteredSnippets.map((snippet : Snippet) => (
+              filteredSnippets.map((snippet: Snippet) => (
                 <div
                   key={snippet.id}
                   className={`h-auto flex flex-col border border-slate-400/20 rounded-lg p-4 mb-4 transition ease-in-out duration-100 cursor-pointer ${selectedSnippetId === snippet.id
-                      ? "bg-[#1a1a1a]/90 border-neutral-500/50"
-                      : "hover:bg-[#272729]/30"
+                    ? "bg-[#1a1a1a]/90 border-neutral-500/50"
+                    : "hover:bg-[#272729]/30"
                     }`}
                   onClick={() => handleSnippetClick(snippet)}
                 >
-                  <div className="text-lg font-bold flex">{snippet.user.username}</div>
-                  <div className="text-md font-medium">{truncateTitle(snippet.title)}</div>
-                  <div className="text-sm font-mono mt-4 flex flex-wrap">
-                    {truncateDescription(snippet.description, 18)}
+                  <div className="flex pb-2 flex-row items-center">
+                    <Avatar className="w-8 h-8 mr-2 rounded-full">
+                      <AvatarImage src={snippet.user.profileImage} alt="User" className="rounded-full" />
+                      <AvatarFallback>{snippet.user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <h2 className="text-lg font-semibold">{snippet.user.username}</h2>
                   </div>
+                  <h3 className="text-sm font-medium">{truncateTitle(snippet.title)}</h3>
+                  <h4 className="text-xs font-mono mt-4 flex flex-wrap">
+                    {truncateDescription(snippet.description, 18)}
+                  </h4>
                   <div className="mt-2">
                     {snippet.tags.map((tag: string) => (
                       <Badge
@@ -165,7 +173,7 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
                 </div>
               ))
             ) : (
-              <div>No snippets found for &quot;{debouncedSearchTerm}&quot;</div>
+              <div className="w-full h-[300px] flex justify-center items-center">No snippets found for &quot;{debouncedSearchTerm}&quot;</div>
             )
           )}
         </div>

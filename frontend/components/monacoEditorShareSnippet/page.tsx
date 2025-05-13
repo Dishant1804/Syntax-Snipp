@@ -4,6 +4,7 @@ import { Copy, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { customTheme } from '@/helpers/helper';
 import { editor } from 'monaco-editor';
+import { useToast } from '@/hooks/use-toast';
 
 type SnippetContent = {
   content: string;
@@ -13,6 +14,7 @@ type SnippetContent = {
 const MonacoEditorShareSnippetComponent: React.FC<SnippetContent> = ({ content, language }) => {
   const monacoRef = useRef<Monaco | null>(null);
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const handleEditorWillMount = (monaco: Monaco) => {
     monaco.editor.defineTheme('customTheme', customTheme);
@@ -36,7 +38,12 @@ const MonacoEditorShareSnippetComponent: React.FC<SnippetContent> = ({ content, 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      //console.error('Failed to copy text: ', err);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
 

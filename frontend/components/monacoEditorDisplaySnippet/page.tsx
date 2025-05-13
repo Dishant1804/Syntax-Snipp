@@ -4,6 +4,7 @@ import { customTheme } from '@/helpers/helper';
 import { Copy, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { editor } from 'monaco-editor';
+import { useToast } from '@/hooks/use-toast';
 
 type SnippetContent = {
   content: string;
@@ -15,6 +16,7 @@ export const MonacoEditorDisplaySnippetComponent = ({ content, language }: Snipp
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: '100%' });
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const handleEditorWillMount = (monaco: Monaco) => {
     monaco.editor.defineTheme('customTheme', customTheme);
@@ -55,7 +57,12 @@ export const MonacoEditorDisplaySnippetComponent = ({ content, language }: Snipp
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      //console.error('Failed to copy text: ', err);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
 
@@ -78,7 +85,7 @@ export const MonacoEditorDisplaySnippetComponent = ({ content, language }: Snipp
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <div 
+              <div
                 className='p-2  rounded-lg items-center flex hover:bg-gray-700/20 cursor-pointer'
                 onClick={handleCopy}
               >
@@ -88,7 +95,7 @@ export const MonacoEditorDisplaySnippetComponent = ({ content, language }: Snipp
             <TooltipContent>
               {copied ? 'Copied!' : 'Copy'}
             </TooltipContent>
-          </Tooltip> 
+          </Tooltip>
         </TooltipProvider>
       </div>
       <div className='flex flex-row w-full justify-start px-2 items-center mb-4'>

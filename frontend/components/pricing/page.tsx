@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import NavbarComponent from "../navbar/page"
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import FooterComponent from "../footer/page";
 
 
 const PricingComponent = () => {
@@ -50,11 +51,11 @@ const PricingComponent = () => {
 
   return <>
     <NavbarComponent isShareSnippet={false} />
-    <div className="w-full h-full min-h-screen flex justify-center items-center">
+    <div className="w-full h-full pt-28 pb-20 flex justify-center items-center my-8 px-4">
       <div className="w-full h-full max-w-7xl flex flex-col justify-center items-center">
         <div className="w-full flex flex-col gap-2 justify-center items-center">
-          <h1 className="text-neutral-300 font-semibold text-4xl">Pricing that makes sense!</h1>
-          <h3 className="text-lg text-neutral-400">Choose the best plan for your needs</h3>
+          <h1 className="text-neutral-300 font-semibold text-3xl md:text-4xl text-center">Pricing that makes sense!</h1>
+          <h3 className="text-lg text-neutral-400 text-center">Choose the best plan for your needs</h3>
         </div>
         <div className="flex w-full max-w-6xl relative justify-between items-center flex-col md:flex-row gap-8 mt-16">
           {plans.map((plan, index) => (
@@ -85,6 +86,7 @@ const PricingComponent = () => {
         </div>
       </div>
     </div >
+    <FooterComponent />
   </>
 }
 

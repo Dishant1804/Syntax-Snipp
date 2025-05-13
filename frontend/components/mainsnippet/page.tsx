@@ -16,10 +16,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from '../ui/button';
 import { formatDate } from '@/helpers/helper'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserProfile {
   username: string;
   email: string;
+  profileImage: string;
 }
 
 export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" | "favorites" }) => {
@@ -32,6 +34,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
   const [copied, setCopied] = useState(false);
   const [url, setUrl] = useState<string>('');
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchProfile();
@@ -48,7 +51,13 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
       }
     }
     catch (e) {
-      console.log(e);
+      //console.log(e);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
+
     }
   }
 
@@ -85,7 +94,13 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      //console.error('Failed to copy text: ', err);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
+
     }
   };
 
@@ -108,13 +123,17 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
           withCredentials: true,
         }
       );
-      console.log(response.data);
 
       if (response.data.message === "Snippet updated successfully") {
         setIsFavorite(!isFavorite);
       }
     } catch (e) {
-      console.log(e);
+      //console.log(e);
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
 
@@ -172,7 +191,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteClick}>Confirm</AlertDialogAction>
+                        <AlertDialogAction onClick={handleDeleteClick} className='bg-neutral-700 hover:bg-neutral-800' >Confirm</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -188,8 +207,9 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
                     onMouseLeave={handleMouseLeave}
                     onClick={handleMouseclickAvatar}
                   >
+                    <AvatarImage src={profile?.profileImage} alt='' />
                     <AvatarFallback>
-                      {profile?.username ? profile.username.charAt(0).toUpperCase() : ''}
+                      {snippet.user.username ? snippet.user.username.charAt(0).toUpperCase() : ''}
                     </AvatarFallback>
                   </Avatar>
                 </PopoverTrigger>
@@ -214,9 +234,11 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
           </div>
           <Separator className="bg-slate-400/20" />
           <div className="mt-4 mb-4 px-6 flex flex-row gap-6 items-center">
-            <Avatar className="h-12 w-12 bg-slate-400/20" onClick={() => router.push('')}>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
+            <Avatar className="h-12 w-12 bg-slate-400/20">
+              <AvatarImage src={snippet.user.profileImage} alt='' />
+              <AvatarFallback>
+                {snippet.user.username ? snippet.user.username.charAt(0).toUpperCase() : ''}
+              </AvatarFallback>
             </Avatar>
             <div className='w-full'>
               <div className="flex flex-row w-full items-center justify-between">
@@ -250,8 +272,8 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
                   )}
                 </div>
               </div>
-              <p className="text-md mt-1">{snippet.title}</p>
-              <p className="text-sm mt-1">
+              <p className="text-sm mt-1">{snippet.title}</p>
+              <p className="text-xs mt-1">
                 {snippet.description
                   ? truncateDescription(snippet.description, 30)
                   : ""}

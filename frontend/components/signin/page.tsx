@@ -62,7 +62,7 @@ export default function SigninComponent() {
         });
       }
     } catch (error) {
-      console.error("Error during Signin:", error);
+      //console.error("Error during Signin:", error);
       toast({
         variant: "destructive",
         title: "Error",

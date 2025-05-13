@@ -24,9 +24,7 @@ const HeroSectionComponent = () => {
           <div className="text-4xl font-bold md:text-7xl text-center md:font-bold md:text-start flex flex-wrap max-w-3xl md:max-w-6xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
             <div className='flex my-2 flex-warp text-center flex-col'>
               <div className='flex flex-row'>
-                {text.map((word, index) =>
-                  <h1 className='mr-6' key={index} >{word}</h1>
-                )}
+                <h1>Unleash your coding superpowers with</h1>
               </div>
               <BlurIn word='Syntax Snipp' duration={2} className='text-4xl md:text-7xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 py-1 inline-block pointer-events-none ' />
             </div>

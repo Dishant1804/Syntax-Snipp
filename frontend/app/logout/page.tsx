@@ -3,9 +3,10 @@ import { SpinnerWithText } from "@/components/ui/spinnerWithText";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Cookies from 'js-cookie';
+import { useToast } from "@/hooks/use-toast";
 
 const Logout = () => {
+  const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -13,8 +14,8 @@ const Logout = () => {
     const logout = async () => {
       setLoading(true);
       try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/logout` , {} , {
-          withCredentials : true,
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/logout`, {}, {
+          withCredentials: true,
         });
 
         if (response.data.success) {
@@ -25,10 +26,22 @@ const Logout = () => {
 
           router.push('/');
         } else {
-          console.error('Logout failed:', response.data.message);
+          //console.error('Logout failed:', response.data.message);
+          toast({
+            title: "Logout Failed",
+            description: "Failed to log out.",
+            variant: "destructive",
+            duration: 3000
+          });
         }
       } catch (error) {
-        console.error('Logout error:', error);
+        //console.error('Logout error:', error);
+        toast({
+          title: "something went wrong",
+          variant: "destructive",
+          duration: 3000
+        });
+
       } finally {
         setLoading(false);
       }
@@ -39,7 +52,7 @@ const Logout = () => {
 
   return (
     <>
-      {loading && 
+      {loading &&
         <div className="w-full h-full flex justify-center items-center">
           <SpinnerWithText />
         </div>
