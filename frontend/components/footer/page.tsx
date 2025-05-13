@@ -43,7 +43,7 @@ const FooterComponent = () => {
           </div>
         </div>
       </div>
-      <h1 className=" text-4xl md:text-8xl py-10 lg:text-[180px] bg-clip-text text-transparent font-sans font-bold bg-gradient-to-b from-neutral-300/60 to-neutral-800/60">Syntax snipp</h1>
+      <h1 className=" text-4xl md:text-8xl py-10 text-center lg:text-[180px] bg-clip-text text-transparent font-sans font-bold bg-gradient-to-b from-neutral-300/60 to-neutral-800/60">Syntax snipp</h1>
     </div>
   </div>
   )

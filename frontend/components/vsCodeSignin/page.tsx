@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { ChromeIcon } from "lucide-react";
 
@@ -75,6 +74,10 @@ const VsCodeSigninComponent = () => {
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google/vscode`;
   };
 
+  const handleGithubSignIn = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
+  };
+
   return (
     <div className="mx-10 sm:mx-auto max-w-[400px] space-y-6 flex flex-col justify-center items-center h-screen">
       <div className="space-y-2 text-center">
@@ -122,7 +125,7 @@ const VsCodeSigninComponent = () => {
         </div>
         <Separator className="my-8" />
         <div className="space-y-4">
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={handleGithubSignIn}>
             <GitHubLogoIcon className="mr-2 h-4 w-4" />
             Sign in with GitHub
           </Button>

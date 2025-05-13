@@ -163,7 +163,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
 
   useEffect(() => {
     fetchProfile();
-  }, [handleAvailNowClick]);
+  }, []);
 
   const fetchProfile = async () => {
     try {
@@ -176,7 +176,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
       }
     }
     catch (e) {
-      //console.log(e);
+      console.log(e);
       //
       toast({
         title: "Something went wrong",
