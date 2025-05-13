@@ -520,7 +520,7 @@ router.patch('/updateprofile', rateLimiter, authMiddleware, async (req, res) => 
 },
 );
 
-router.get("/user/profile", rateLimit, authMiddleware, async (req, res) => {
+router.get("/user/profile", authMiddleware, async (req, res) => {
   const userId = req.user.userId;
 
   try {
