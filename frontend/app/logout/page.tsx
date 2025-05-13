@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import Cookies from 'js-cookie';
 
 const Logout = () => {
   const { toast } = useToast();
