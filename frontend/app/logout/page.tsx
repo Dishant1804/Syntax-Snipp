@@ -27,7 +27,9 @@ const Logout = () => {
 
           router.push('/');
         } else {
-          //console.error('Logout failed:', response.data.message);
+          if(process.env.NODE_ENV !== 'production'){
+            console.error('Logout failed:', response.data.message);
+          }
           toast({
             title: "Logout Failed",
             description: "Failed to log out.",
@@ -36,7 +38,9 @@ const Logout = () => {
           });
         }
       } catch (error) {
-        //console.error('Logout error:', error);
+        if(process.env.NODE_ENV !== 'production'){
+          console.error('Logout error:', error);
+        }
         toast({
           title: "something went wrong",
           variant: "destructive",

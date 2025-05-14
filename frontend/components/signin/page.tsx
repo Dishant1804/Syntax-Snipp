@@ -62,7 +62,9 @@ export default function SigninComponent() {
         });
       }
     } catch (error) {
-      //console.error("Error during Signin:", error);
+      if(process.env.NODE_ENV !== 'production'){
+        console.error("Error during Signin:", error);
+      }
       toast({
         variant: "destructive",
         title: "Error",

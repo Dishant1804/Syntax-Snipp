@@ -59,7 +59,9 @@ const EditSnippetComponent = () => {
         setIsPrivate(response.data.snippet.isPrivate || false);
       }
     } catch (e) {
-      //console.log(e);
+      if(process.env.NODE_ENV !== 'production'){
+        console.log(e);
+      }
       toast({
         title: "Something went wrong",
         variant: "destructive",

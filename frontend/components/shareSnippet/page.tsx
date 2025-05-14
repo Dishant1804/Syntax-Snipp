@@ -38,7 +38,9 @@ const ShareSnippetComponent: React.FC = () => {
           const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/sharesnippet/${id}`);
           setSnippet(response.data.snippet);
         } catch (error) {
-          //console.error('Error fetching snippet:', error);
+          if(process.env.NODE_ENV !== 'production'){
+            console.error('Error fetching snippet:', error);
+          }
           toast({
             title: "Something went wrong",
             variant: "destructive",

@@ -49,7 +49,9 @@ const VsCodeSigninComponent = () => {
       if (response.data.success) {
         window.location.href = response.data.redirectUrl
       } else {
-        //console.error('Authentication failed:', response.data.message);
+        if(process.env.NODE_ENV !== 'production'){
+          console.error('Authentication failed:', response.data.message);
+        }
         toast({
           title: "Authentication Failed",
           description: "Invalid Credentials.",
@@ -60,7 +62,9 @@ const VsCodeSigninComponent = () => {
       setEmail("");
       setPassword("");
     } catch (error) {
-      //console.error("Error during Signin:", error);
+      if(process.env.NODE_ENV !== 'production'){
+        console.error("Error during Signin:", error);
+      }
       toast({
         title: "Error while signing up",
         description: "Something went wrong try again after sometime",

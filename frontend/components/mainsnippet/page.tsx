@@ -51,7 +51,9 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
       }
     }
     catch (e) {
-      //console.log(e);
+      if(process.env.NODE_ENV !== 'production'){
+        console.log(e);
+      }
       toast({
         title: "Something went wrong",
         variant: "destructive",
@@ -94,7 +96,9 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      //console.error('Failed to copy text: ', err);
+      if(process.env.NODE_ENV !== 'production'){
+        console.error('Failed to copy text: ', err);
+      }
       toast({
         title: "Something went wrong",
         variant: "destructive",
@@ -128,7 +132,9 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
         setIsFavorite(!isFavorite);
       }
     } catch (e) {
-      //console.log(e);
+      if(process.env.NODE_ENV !== 'production'){
+        console.log(e);
+      }
       toast({
         title: "Something went wrong",
         variant: "destructive",

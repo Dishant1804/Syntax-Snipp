@@ -83,7 +83,9 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
         handleRazorpayScreen(response.data.amount);
       })
       .catch((error) => {
-        //console.log("error at", error);
+        if(process.env.NODE_ENV !== 'production'){
+          console.log("error at", error);
+        }
 
         toast({
           title: "Something went wrong",
@@ -134,7 +136,9 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
             });
           }
         } catch (error) {
-          //console.error("Subscription activation error:", error);
+          if(process.env.NODE_ENV !== 'production'){
+            console.error("Subscription activation error:", error);
+          }
           toast({
             title: "Activation Error",
             description: "There was an issue activating your subscription. Please try again or contact support.",
@@ -176,8 +180,9 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
       }
     }
     catch (e) {
-      console.log(e);
-      //
+      if(process.env.NODE_ENV !== 'production'){
+        console.log(e);
+      }
       toast({
         title: "Something went wrong",
         variant: "destructive",

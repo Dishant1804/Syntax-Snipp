@@ -47,7 +47,9 @@ const ProfileComponent = ({ option }: { option: string }) => {
       setCanUpdateUsername(daysSinceUpdate >= 30 || daysSinceCreation >= 30);
 
     } catch (error) {
-      //console.error("Error fetching profile:", error);
+      if(process.env.NODE_ENV !== 'production'){
+        console.error("Error fetching profile:", error);
+      }
       toast({
         title: "Something went wrong",
         variant: "destructive",
@@ -80,7 +82,9 @@ const ProfileComponent = ({ option }: { option: string }) => {
         router.push('/dashboard');
       }
     } catch (e) {
-      //console.log(e);
+      if(process.env.NODE_ENV !== 'production'){
+        console.log(e);
+      }
       setUsernameError('An error occurred while updating your profile.');
     }
   }

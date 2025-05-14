@@ -89,7 +89,9 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
         router.push('/dashboard')
       }
     } catch (error) {
-      //console.error('Error creating snippet:', error);
+      if(process.env.NODE_ENV !== 'production'){
+        console.error('Error creating snippet:', error);
+      }
       toast({
         title: "Something went wrong",
         variant: "destructive",

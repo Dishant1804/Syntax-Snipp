@@ -96,7 +96,9 @@ const MonacoEditorEditSnippetComponent = ({ id, title, description, tags, conten
         router.push('/dashboard');
       }
     } catch (error) {
-      //console.error('Error saving snippet:', error);
+      if(process.env.NODE_ENV !== 'production'){
+        console.error('Error saving snippet:', error);
+      }
       toast({
         title: "Something went wrong",
         description: "Please try again.",

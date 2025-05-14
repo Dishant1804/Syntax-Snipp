@@ -75,7 +75,9 @@ export const SearchComponent = ({ isSnippetDeleted, setActiveTab }: { isSnippetD
         setSelectedSnippetId(fetchedSnippets[0].id);
       }
     } catch (e) {
-      //console.error(e);
+      if(process.env.NODE_ENV !== 'production'){
+        console.error(e);
+      }
       setError("Failed to fetch snippets");
       setSnippets([]);
     }
