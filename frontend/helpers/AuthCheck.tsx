@@ -37,6 +37,7 @@ const AuthCheck = ({ children }: any) => {
         }
       }
       catch (error) {
+        console.log(error);
         toast({
           title: "Something went wrong",
           description: "Please login again!",
