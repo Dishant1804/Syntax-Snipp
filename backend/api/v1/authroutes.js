@@ -172,7 +172,7 @@ router.post("/signin", rateLimiter, async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       secure: true,
     });
     return res.json({ status: "signedin", success: true });
@@ -430,13 +430,13 @@ router.get('/github/callback', passport.authenticate('github', {
 
       res.cookie("token", newToken, {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         secure: true,
       });
 
       res.cookie("githubToken", token, {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         secure: true,
       });
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
@@ -470,7 +470,7 @@ router.patch('/updateprofile', rateLimiter, authMiddleware, async (req, res) => 
     if (username) {
       updateData.username = username;
     }
-    http://localhost:300
+    
     if (email) {
       const existingUser = await prisma.user.findUnique({
         where: {
@@ -564,7 +564,7 @@ router.post("/logout", authMiddleware, async (req, res) => {
 
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       secure: true
     });
 
