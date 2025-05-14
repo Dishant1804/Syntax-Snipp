@@ -392,12 +392,12 @@ router.get('/google/vscode/callback', passport.authenticate('google-vscode', {
 );
 
 router.get("/github", (req, res, next) => {
-  passport.authenticate("github", {
+  passport.authenticate("github-dashboard", {
     scope: ["read:user", "user:email"],
   })(req, res, next);
 });
 
-router.get('/github/callback', passport.authenticate('github', {
+router.get('/github/callback', passport.authenticate('github-dashboard', {
   session: false,
   failureRedirect: "/login",
 }),
@@ -465,6 +465,59 @@ router.get('/github/callback', passport.authenticate('github', {
   },
 );
 
+
+router.get('/github/vscode', (req, res, next) => {
+  passport.authenticate('github-vscode', {
+    scope: ['read:user', 'user:email'],
+  })(req, res, next);
+});
+
+router.get('/github/vscode/callback', passport.authenticate('github-vscode', {
+  session: false,
+  failureRedirect: '/login',
+}),
+  async (req, res) => {
+    try {
+      const { profile, token } = req.user;
+      const hashedToken = await hash(token, saltRounds);
+      const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+
+      let user = await prisma.user.findUnique({
+        where: {
+          email: email,
+        },
+      });
+
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            username: profile.username.toLowerCase(),
+            email: email,
+            profileImage: profile._json.avatar_url,
+            passwordHash: hashedToken,
+            isGithub: true,
+          },
+        });
+      }
+
+      const subscription = await prisma.user.findUnique({
+        where: {
+          email: profile.emails[0].value,
+        },
+        select: {
+          isSubscribed: true,
+        }
+      })
+
+      const tokenForRedirect = jwt.sign({ userId: user.id }, JWT_SECRET);
+
+      res.redirect(`http://localhost:54321/auth/${tokenForRedirect}/${subscription.isSubscribed}`);
+    } catch (error) {
+      console.error('Error linking GitHub account for VS Code:', error);
+      res.status(500).json({ error: 'Failed to link GitHub account for VS Code', success: false });
+    }
+  },
+);
 
 router.patch('/updateprofile', rateLimiter, authMiddleware, async (req, res) => {
   const { username, email, password } = req.body;
