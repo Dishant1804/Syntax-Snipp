@@ -183,7 +183,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
                   onClick={handleFavoriteClick}
                 />
               )}
-              {activeTab === "mysnippets" && (
+              {(snippet.user.email === profile?.email) && (
                 <>
                   <Pencil className="h-5 w-5 cursor-pointer" onClick={handleEditClick} />
                   <AlertDialog>
