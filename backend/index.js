@@ -17,8 +17,6 @@ const allowedOrigins = [
   'http://localhost:54321',
   'https://www.syntax-snipp.xyz',
   'https://syntax-snipp.xyz',
-  'https://backend.syntax-snipp.xyz',
-  'https://checkout.razorpay.com'
 ]
 
 const corsOptions = {
