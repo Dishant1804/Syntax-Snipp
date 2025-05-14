@@ -22,7 +22,19 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log("cors origin",origin)
+    console.log("CORS Middleware - Request Origin Header:", requestOrigin);
+    if (!requestOrigin) {
+      console.log("CORS Middleware - No origin header present. Denying for credentialed request.");
+      return callback(new Error('Not allowed by CORS: Origin header missing for credentialed request.'));
+    }
+    if (allowedOrigins.includes(requestOrigin)) {
+      console.log(`CORS Middleware - Origin ${requestOrigin} IS ALLOWED.`);
+      callback(null, true);
+    } else {
+      console.log(`CORS Middleware - Origin ${requestOrigin} IS NOT ALLOWED.`);
+      callback(new Error(`Not allowed by CORS: Origin ${requestOrigin} not in allowed list.`));
+    }
+
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true)
     } else {
