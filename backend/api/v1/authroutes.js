@@ -160,8 +160,11 @@ router.post("/signin", rateLimiter, async (req, res) => {
         data: { isValid: false },
       });
     }
+    console.log("before token signin")
 
     const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
+    
+    console.log("after token signin")
 
     await prisma.session.create({
       data: {
@@ -175,6 +178,8 @@ router.post("/signin", rateLimiter, async (req, res) => {
       sameSite: "none",
       secure: true,
     });
+    console.log("cookies set signin")
+
     return res.json({ status: "signedin", success: true });
   } catch (e) {
     console.log(e);
@@ -320,11 +325,16 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
           token,
         },
       });
+      console.log("before setting token google callback")
+
       res.cookie("token", token, {
         httpOnly: true,
         sameSite: "none",
         secure: true,
       });
+
+      console.log("after setting token google callback")
+
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (e) {
       console.log(e);
