@@ -79,7 +79,7 @@ const VsCodeSigninComponent = () => {
   };
 
   const handleGithubSignIn = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github/vscode`;
   };
 
   return (
