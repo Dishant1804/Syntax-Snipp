@@ -34,6 +34,11 @@ const rateLimiter = rateLimit({
 });
 
 router.get("/check-session", async (req, res) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,PATCH,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
   const token = req.cookies.token;
 
   if (!token) {
@@ -105,6 +110,8 @@ router.post("/signup", rateLimiter, async (req, res) => {
       httpOnly: true,
       sameSite: "none",
       secure: true,
+      domain: ".syntax-snipp.xyz",
+      path: "/"
     });
     return res.status(201).json({ status: "signedup", success: true });
   } catch (e) {
@@ -163,7 +170,7 @@ router.post("/signin", rateLimiter, async (req, res) => {
     console.log("before token signin")
 
     const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
-    
+
     console.log("after token signin")
 
     await prisma.session.create({
@@ -177,6 +184,8 @@ router.post("/signin", rateLimiter, async (req, res) => {
       httpOnly: true,
       sameSite: "none",
       secure: true,
+      domain: ".syntax-snipp.xyz",
+      path: "/"
     });
     console.log("cookies set signin")
 
@@ -331,6 +340,8 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
         httpOnly: true,
         sameSite: "none",
         secure: true,
+        domain: ".syntax-snipp.xyz",
+        path: "/"
       });
 
       console.log("after setting token google callback")
@@ -442,6 +453,8 @@ router.get('/github/callback', passport.authenticate('github', {
         httpOnly: true,
         sameSite: "none",
         secure: true,
+        domain: ".syntax-snipp.xyz",
+        path: "/"
       });
 
       res.cookie("githubToken", token, {
@@ -480,7 +493,7 @@ router.patch('/updateprofile', rateLimiter, authMiddleware, async (req, res) => 
     if (username) {
       updateData.username = username;
     }
-    
+
     if (email) {
       const existingUser = await prisma.user.findUnique({
         where: {
