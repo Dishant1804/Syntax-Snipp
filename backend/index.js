@@ -35,8 +35,8 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet());
 app.use(cors(corsOptions));
+app.use(helmet());
 app.use(passport.initialize());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/snippet", snippetRoutes);
