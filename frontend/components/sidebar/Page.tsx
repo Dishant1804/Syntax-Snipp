@@ -162,7 +162,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
 
   const handleAvailNowClick = () => {
     setIsDialogOpen(false);
-    createRazorpayOrder(1);
+    createRazorpayOrder(340);
   };
 
   useEffect(() => {
