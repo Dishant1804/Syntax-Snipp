@@ -11,12 +11,27 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:54321',
+  'https://www.syntax-snipp.xyz',
+  'https://backend.syntax-snipp.xyz',
+  'https://checkout.razorpay.com'
+]
+
 const corsOptions = {
-  origin: ["https://github.com/", "http://localhost:54321", "https://backend.syntax-snipp.xyz", "https://www.syntax-snipp.xyz", "http://localhost:3001", "http://localhost:3000", "https://checkout.razorpay.com"],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}
 
 app.use(express.json());
 app.use(cookieParser());
