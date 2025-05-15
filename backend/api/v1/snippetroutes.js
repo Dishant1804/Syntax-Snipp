@@ -20,7 +20,7 @@ router.get('/easter', (req, res) => {
  * Create a new snippet
  */
 router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) => {
-  const { title, content, description, tags, favorite, language, isPrivate } = req.body;
+  const { title, content, description, tags, language, isPrivate } = req.body;
   const userId = req.user.userId;
 
   if (!title || !content || !description) {
@@ -58,7 +58,6 @@ router.post('/createsnippet', authMiddleware, SnippetLimiter, async (req, res) =
         content: content,
         description: description,
         userId: userId,
-        favorite: favorite,
         language: language,
         isPrivate: isPrivate,
         tags: {
@@ -207,6 +206,11 @@ router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, re
               }
             }
           }
+        },
+        favorites: {
+          where: {
+            userId: userId
+          }
         }
       }
     });
@@ -217,7 +221,8 @@ router.get('/displayallsnippets', authMiddleware, SnippetLimiter, async (req, re
 
     const formattedSnippets = allSnippets.map(snippet => ({
       ...snippet,
-      tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
+      tags: snippet.tags.map(tagRelation => tagRelation.tag.name),
+      isFavorite: snippet.favorites.length > 0
     }));
 
     return res.status(200).json({ allSnippets: formattedSnippets, isSubscribed: subscription.isSubscribed })
@@ -256,6 +261,11 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
           include: {
             tag: true,
           }
+        },
+        favorites: {
+          where: {
+            userId: userId
+          }
         }
       },
     });
@@ -269,13 +279,13 @@ router.get('/mysnippets', authMiddleware, SnippetLimiter, async (req, res) => {
       title: snippet.title,
       description: snippet.description,
       content: snippet.content,
-      favorite: snippet.favorite,
       user: snippet.user,
       language: snippet.language,
       createdAt: snippet.createdAt,
       updatedAt: snippet.updatedAt,
       isPrivate: snippet.isPrivate,
-      tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
+      tags: snippet.tags.map(tagRelation => tagRelation.tag.name),
+      isFavorite: snippet.favorites.length > 0
     }));
 
     return res.status(200).json({ snippets: formattedSnippets, isSubscribed: subscription.isSubscribed });
@@ -325,7 +335,7 @@ router.delete('/deletesnippet/:id', authMiddleware, SnippetLimiter, async (req, 
 router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, res) => {
   const { id } = req.params;
   const userId = req.user.userId;
-  const { title, description, content, favorite, tags, language, isPrivate } = req.body;
+  const { title, description, content, tags, language, isPrivate } = req.body;
 
   try {
     const subscription = await prisma.user.findUnique({
@@ -387,13 +397,6 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
       updateData.isPrivate = isPrivate;
     }
 
-    if (favorite !== undefined) {
-      if (typeof favorite !== 'boolean') {
-        return res.status(400).json({ "error": "Favorite must be a boolean" });
-      }
-      updateData.favorite = favorite;
-    }
-
     if (tags !== undefined) {
       if (!Array.isArray(tags) || tags.some(tag => typeof tag !== 'string' || tag.trim().length === 0)) {
         return res.status(400).json({ "error": "Tags must be an array of non-empty strings" });
@@ -434,62 +437,71 @@ router.patch('/updatesnippet/:id', authMiddleware, SnippetLimiter, async (req, r
   }
 });
 
-export default router;
+/**
+ * Mark a snippet as favorite
+ */
+router.post('/favorite/:snippetId', authMiddleware, SnippetLimiter, async (req, res) => {
+  const userId = req.user.userId;
+  const { snippetId } = req.params;
+  try {
+    await prisma.favorite.create({
+      data: { userId, snippetId }
+    });
+    return res.status(200).json({ message: 'Snippet marked as favorite' });
+  } catch (e) {
+    if (e.code === 'P2002') {
+      return res.status(409).json({ message: 'Snippet already favorited' });
+    }
+    console.error(e);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 /**
- * Display user's favorite snippets
+ * Unmark a snippet as favorite
+ */
+router.delete('/favorite/:snippetId', authMiddleware, SnippetLimiter, async (req, res) => {
+  const userId = req.user.userId;
+  const { snippetId } = req.params;
+  try {
+    await prisma.favorite.delete({
+      where: { userId_snippetId: { userId, snippetId } }
+    });
+    return res.status(200).json({ message: 'Snippet removed from favorites' });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * Display user's favorite snippets (via Favorite model)
  */
 router.get('/favoritesnippets', authMiddleware, SnippetLimiter, async (req, res) => {
   const userId = req.user.userId;
-
   try {
-    const subscription = await prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    const favoriteSnippets = await prisma.snippet.findMany({
-      where: {
-        userId: userId,
-        favorite: true
-      },
+    const subscription = await prisma.user.findUnique({ where: { id: userId } });
+    const favorites = await prisma.favorite.findMany({
+      where: { userId },
       include: {
-        user: {
-          select: {
-            username: true,
-            email: true,
-            profileImage: true,
-          }
-        },
-        tags: {
+        snippet: {
           include: {
-            tag: true,
+            user: { select: { username: true, email: true, profileImage: true } },
+            tags: { include: { tag: true } }
           }
         }
-      },
+      }
     });
-
-    if (!favoriteSnippets || favoriteSnippets.length === 0) {
-      return res.status(200).json({ message: "No favorite snippets found for this user", snippets: [] });
-    }
-
-    const formattedSnippets = favoriteSnippets.map(snippet => ({
-      id: snippet.id,
-      title: snippet.title,
-      description: snippet.description,
-      content: snippet.content,
-      favorite: snippet.favorite,
-      user: snippet.user,
-      language: snippet.language,
-      createdAt: snippet.createdAt,
-      updatedAt: snippet.updatedAt,
-      isPrivate: snippet.isPrivate,
-      tags: snippet.tags.map(tagRelation => tagRelation.tag.name)
+    const formattedSnippets = favorites.map(fav => ({
+      ...fav.snippet,
+      tags: fav.snippet.tags.map(tagRelation => tagRelation.tag.name),
+      isFavorite: true
     }));
-
     return res.status(200).json({ snippets: formattedSnippets, isSubscribed: subscription.isSubscribed });
-  }
-  catch (e) {
+  } catch (e) {
     console.error(e);
-    return res.status(500).json({ "error": "Internal server error" });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+export default router;

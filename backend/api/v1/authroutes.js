@@ -152,21 +152,7 @@ router.post("/signin", rateLimiter, async (req, res) => {
         .json({ message: "Invalid Credentials", success: false });
     }
 
-    const existingSessions = await prisma.session.findMany({
-      where: { userId: user.id, isValid: true },
-    });
-
-    if (existingSessions.length > 0) {
-      await prisma.session.updateMany({
-        where: { userId: user.id },
-        data: { isValid: false },
-      });
-    }
-    console.log("before token signin")
-
     const token = jwt.sign({ userId: user.id, sessionId: uuidv4() }, JWT_SECRET);
-
-    console.log("after token signin")
 
     await prisma.session.create({
       data: {
@@ -175,6 +161,22 @@ router.post("/signin", rateLimiter, async (req, res) => {
       },
     });
 
+    const userSessions = await prisma.session.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (userSessions.length >= 3) {
+      const sessionsToDelete = userSessions.slice(2);
+      
+      if (sessionsToDelete.length > 0) {
+        const sessionIdsToDelete = sessionsToDelete.map(session => session.id);
+        await prisma.session.deleteMany({
+          where: { id: { in: sessionIdsToDelete } },
+        });
+      }
+    }
+
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "none",
@@ -182,7 +184,6 @@ router.post("/signin", rateLimiter, async (req, res) => {
       domain: ".syntax-snipp.xyz",
       path: "/"
     });
-    console.log("cookies set signin")
 
     return res.json({ status: "signedin", success: true });
   } catch (e) {
@@ -247,6 +248,22 @@ router.post("/signin-vscode", rateLimiter, async (req, res) => {
         token,
       },
     });
+
+    const userSessions = await prisma.session.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (userSessions.length >= 3) {
+      const sessionsToDelete = userSessions.slice(2);
+      
+      if (sessionsToDelete.length > 0) {
+        const sessionIdsToDelete = sessionsToDelete.map(session => session.id);
+        await prisma.session.deleteMany({
+          where: { id: { in: sessionIdsToDelete } },
+        });
+      }
+    }
 
     const subscription = await prisma.user.findUnique({
       where: {
@@ -329,7 +346,22 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
           token,
         },
       });
-      console.log("before setting token google callback")
+
+      const userSessions = await prisma.session.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+      });
+  
+      if (userSessions.length >= 3) {
+        const sessionsToDelete = userSessions.slice(2);
+        
+        if (sessionsToDelete.length > 0) {
+          const sessionIdsToDelete = sessionsToDelete.map(session => session.id);
+          await prisma.session.deleteMany({
+            where: { id: { in: sessionIdsToDelete } },
+          });
+        }
+      }
 
       res.cookie("token", token, {
         httpOnly: true,
@@ -443,6 +475,22 @@ router.get('/github/callback', passport.authenticate('github-dashboard', {
           token: newToken,
         },
       });
+
+      const userSessions = await prisma.session.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+      });
+  
+      if (userSessions.length >= 3) {
+        const sessionsToDelete = userSessions.slice(2);
+        
+        if (sessionsToDelete.length > 0) {
+          const sessionIdsToDelete = sessionsToDelete.map(session => session.id);
+          await prisma.session.deleteMany({
+            where: { id: { in: sessionIdsToDelete } },
+          });
+        }
+      }
 
       res.cookie("token", newToken, {
         httpOnly: true,
