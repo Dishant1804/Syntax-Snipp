@@ -6,7 +6,7 @@ type Snippet = {
   description: string;
   content: string;
   language: string;
-  favorite: boolean;
+  isFavorite: boolean;
   user: {
     username: string;
     email: string;

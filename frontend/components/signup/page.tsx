@@ -213,13 +213,13 @@ export default function SignupComponent() {
                 >
                   <ChromeIcon className="md:w-5 md:h-5 h-4 w-4" />Sign up with Google
                 </Button>
-                {/* <Button
+                <Button
                   type="button"
                   className="w-full items-center gap-2 bg-white/90 text-black hover:bg-neutral-300"
                   onClick={handleGithubSignUp}
                 >
                   <GitHubLogoIcon className="md:w-5 md:h-5 h-4 w-4" />Sign up with Github
-                </Button> */}
+                </Button>
               </div>
             </div>
           </div>

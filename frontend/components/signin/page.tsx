@@ -192,14 +192,14 @@ export default function SigninComponent() {
                       <ChromeIcon className="md:w-5 md:h-5 h-4 w-4" />
                       Sign in with Google
                     </Button>
-                    {/* <Button
+                    <Button
                       type="button"
                       className="w-full items-center gap-2 bg-white/90 text-black hover:bg-neutral-300"
                       onClick={handleGithubSignIn}
                     >
                       <GitHubLogoIcon className="md:w-5 md:h-5 h-4 w-4" />
                       Sign in with GitHub
-                    </Button> */}
+                    </Button>
                   </div>
                 </div>
               </div>

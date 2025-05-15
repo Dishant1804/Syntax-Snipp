@@ -129,10 +129,10 @@ const VsCodeSigninComponent = () => {
         </div>
         <Separator className="my-8" />
         <div className="space-y-4">
-          {/* <Button variant="outline" className="w-full" onClick={handleGithubSignIn}>
+          <Button variant="outline" className="w-full" onClick={handleGithubSignIn}>
             <GitHubLogoIcon className="mr-2 h-4 w-4" />
             Sign in with GitHub
-          </Button> */}
+          </Button>
           <Button
             variant="outline"
             className="w-full"

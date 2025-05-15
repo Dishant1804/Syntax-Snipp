@@ -27,7 +27,7 @@ interface UserProfile {
 export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIsSnippetDeleted: React.Dispatch<SetStateAction<boolean>>, activeTab: "allsnippets" | "mysnippets" | "favorites" }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const snippet = useSelector((state: RootState) => state.snippet.selectedSnippet);
-  const [isFavorite, setIsFavorite] = useState<boolean>(snippet?.favorite || false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(snippet?.isFavorite|| false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const timeoutRef = useRef<number | null>(null);
@@ -51,7 +51,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
       }
     }
     catch (e) {
-      if(process.env.NODE_ENV !== 'production'){
+      if (process.env.NODE_ENV !== 'production') {
         console.log(e);
       }
       toast({
@@ -82,7 +82,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
       const snippetUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/sharesnippet/${snippet.id}`;
       setUrl(snippetUrl);
       setLoading(true);
-      setIsFavorite(snippet.favorite);
+      setIsFavorite(snippet.isFavorite);
       const timer = setTimeout(() => {
         setLoading(false);
       }, 250);
@@ -96,7 +96,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      if(process.env.NODE_ENV !== 'production'){
+      if (process.env.NODE_ENV !== 'production') {
         console.error('Failed to copy text: ', err);
       }
       toast({
@@ -115,24 +115,35 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
   const handleFavoriteClick = async () => {
     const id = snippet.id;
 
-    const updateData = {
-      favorite: !isFavorite,
-    };
-
     try {
-      const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/updatesnippet/${id}`,
-        updateData,
-        {
-          withCredentials: true,
-        }
-      );
+      let response;
 
-      if (response.data.message === "Snippet updated successfully") {
-        setIsFavorite(!isFavorite);
+      if (isFavorite) {
+        response = await axios.delete(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/favorite/${id}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.status === 200) {
+          setIsFavorite(!isFavorite);
+        }
+      } else {
+        response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/snippet/favorite/${id}`,
+          {},
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.status === 200) {
+          setIsFavorite(!isFavorite);
+        }
       }
     } catch (e) {
-      if(process.env.NODE_ENV !== 'production'){
+      if (process.env.NODE_ENV !== 'production') {
         console.log(e);
       }
       toast({
@@ -171,7 +182,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
         <>
           <div className="py-4 px-8 flex flex-row justify-between items-center">
             <div className="flex flex-row gap-4">
-              {isFavorite ? (
+              {(isFavorite || snippet.isFavorite) ? (
                 <FontAwesomeIcon
                   icon={faStar}
                   className="h-5 w-5 cursor-pointer"
