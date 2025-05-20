@@ -371,8 +371,6 @@ router.get('/google/dashboard/callback', passport.authenticate('google-dashboard
         path: "/"
       });
 
-      console.log("after setting token google callback")
-
       res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (e) {
       console.log(e);
