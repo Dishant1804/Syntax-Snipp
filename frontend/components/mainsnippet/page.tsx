@@ -317,6 +317,7 @@ export const MainSnippetComponent = ({ setIsSnippetDeleted, activeTab }: { setIs
           <Separator className="bg-slate-400/20" />
           <div className="mt-4">
             <MonacoEditorDisplaySnippetComponent
+              title={snippet.title}
               content={snippet.content}
               language={snippet.language}
             />

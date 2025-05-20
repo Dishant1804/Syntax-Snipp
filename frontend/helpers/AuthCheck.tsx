@@ -17,7 +17,11 @@ const AuthCheck = ({ children }: any) => {
 
   useLayoutEffect(() => {
     const checkAuth = async () => {
-      if (publicRoutes.includes(pathname)) {
+      const isPublicRoute = publicRoutes.some(route => 
+        pathname === route || pathname.startsWith(`${route}/`)
+      );
+
+      if (isPublicRoute) {
         setLoading(false);
         return;
       }
@@ -51,8 +55,7 @@ const AuthCheck = ({ children }: any) => {
     };
 
     checkAuth();
-  }, [pathname, router]);
-
+  }, [pathname, router, toast]);
 
   if (loading) {
     return <div className="w-full bg-[#111111] h-full flex justify-center items-center">
@@ -63,4 +66,4 @@ const AuthCheck = ({ children }: any) => {
   return children;
 };
 
-export default AuthCheck;
+export default AuthCheck

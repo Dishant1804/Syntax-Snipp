@@ -207,7 +207,7 @@ export const Sidebar = ({ isCollapsed }: SidebarProps) => {
   return (
     <div
       data-collapsed={isCollapsed}
-      className="w-full h-screen flex flex-col justify-between text-white/90 group border-r border-neutral-800"
+      className="w-full h-full min-h-screen flex flex-col justify-between text-white/90 group border-r border-neutral-800"
     >
       <div className='flex flex-col'>
         <div className={cn(

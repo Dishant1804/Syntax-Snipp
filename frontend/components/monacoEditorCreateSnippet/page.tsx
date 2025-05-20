@@ -115,12 +115,12 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
         </div>
         <div className='flex flex-row w-full justify-between px-8 items-center mb-4'>
           <div className='flex flex-row items-center'>
-            <h2>Select the language : &nbsp; </h2>
+            <h2>language : &nbsp; </h2>
             <Select onValueChange={setSelectedLanguage} defaultValue={selectedLanguage}>
               <SelectTrigger className="w-[180px] border-white/20 outline-none">
                 <SelectValue placeholder="Select a language" />
               </SelectTrigger>
-              <SelectContent className='bg-[#272727] text-white/90 border-white/20 '>
+              <SelectContent className='bg-[#272727] text-white/90 border-white/20 flex '>
                 {languages.map((lang) => (
                   <SelectItem key={lang} value={lang}>
                     {lang}
@@ -142,8 +142,8 @@ export const MonacoEditorCreateSnippetComponent = ({ title, description, tags }:
                 <LockKeyholeIcon className="h-4 w-4" />
                 <span>Private</span>
                 {!isSubscribed && (
-                  <span className="ml-2 text-sm text-neutral-400 tooltip" data-tip="Premium feature">
-                    (Premium)
+                  <span className="text-sm text-neutral-400 tooltip" data-tip="Premium feature">
+                    (Pro)
                   </span>
                 )}
               </Label>
